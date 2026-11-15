@@ -26,13 +26,20 @@ CAP.resumePersonne = {
   }
 };
 
-// Crée (ou recrée) une collection avec son validateur $jsonSchema
+// Crée une collection ou met à jour son validateur sans supprimer les données.
 CAP.creer = function (nom, schema) {
-  db.getCollection(nom).drop();
-  db.createCollection(nom, {
+  const options = {
     validator: { $jsonSchema: schema },
     validationLevel: "strict",
     validationAction: "error"
-  });
-  print("collection créée : " + nom);
+  };
+  if (db.getCollectionInfos({ name: nom }).length === 0) {
+    db.createCollection(nom, options);
+    print("collection créée : " + nom);
+  } else {
+    const resultat = db.runCommand({ collMod: nom, ...options });
+    if (!resultat.ok) throw new Error("Validateur non mis à jour : " + nom);
+    print("validateur mis à jour : " + nom);
+  }
 };
+
