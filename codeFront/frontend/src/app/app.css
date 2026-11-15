@@ -1,0 +1,4 @@
+:host { display: block; font-family: system-ui, sans-serif; padding: 1rem; }
+.online { color: #1a7f37; }
+.offline { color: #cf222e; }
+.checking { color: #6e7781; }

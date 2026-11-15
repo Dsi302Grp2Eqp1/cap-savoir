@@ -1,0 +1,23 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+
+/** Single entry point for backend calls. Always build URLs from environment.apiUrl. */
+@Injectable({ providedIn: 'root' })
+export class ApiService {
+  private readonly http = inject(HttpClient);
+  readonly baseUrl = environment.apiUrl;
+
+  get<T>(path: string): Observable<T> {
+    return this.http.get<T>(`${this.baseUrl}${path}`);
+  }
+
+  post<T>(path: string, body: unknown): Observable<T> {
+    return this.http.post<T>(`${this.baseUrl}${path}`, body);
+  }
+
+  health(): Observable<string> {
+    return this.http.get(`${this.baseUrl}/health`, { responseType: 'text' });
+  }
+}
