@@ -1,20 +1,23 @@
 // CapSavoir — création de la base MongoDB (MongoDB Atlas)
 // À lancer depuis la racine du dépôt :
-//   mongosh "<chaîne de connexion Atlas>" db/init.js
+//   mongosh "<chaîne de connexion>" --file codeBack/backend/db/init.js
+// Les chemins sont résolus depuis ce fichier, quel que soit le dossier courant.
+// CAPSAVOIR_DB_NAME permet de cibler une base de test (défaut : capsavoir).
 
-db = db.getSiblingDB("capsavoir");
+{
+const chemin = require("path");
+const fs = require("fs");
+const fichiers = ["_commun", "Formation", "Quiz", "Demande", "Utilisateur", "Inscription", "Tentative", "Certificat"]
+  .map(nom => chemin.join(__dirname, "schemas", nom + ".js"));
 
-load("db/schemas/_commun.js");
+// Vérifie tous les fichiers avant la première modification de la base.
+for (const fichier of fichiers) {
+  if (!fs.existsSync(fichier)) throw new Error("Fichier de schéma absent : " + fichier);
+}
 
-// Personne A
-load("db/schemas/Formation.js");
-load("db/schemas/Quiz.js");
-load("db/schemas/Demande.js");
+db = db.getSiblingDB(process.env.CAPSAVOIR_DB_NAME || "capsavoir");
+for (const fichier of fichiers) load(fichier);
 
-// Personne B
-load("db/schemas/Utilisateur.js");
-load("db/schemas/Inscription.js");
-load("db/schemas/Tentative.js");
-load("db/schemas/Certificat.js");
+print("Base " + db.getName() + " prête : " + db.getCollectionNames().join(", "));
+}
 
-print("Base capsavoir prête : " + db.getCollectionNames().join(", "));
