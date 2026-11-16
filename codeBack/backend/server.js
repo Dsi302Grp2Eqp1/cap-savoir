@@ -1,10 +1,10 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
 const app = require('./src/app');
+const { connecter } = require('./src/db');
 
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Mongo connected'))
-  .catch(err => console.error('Mongo error', err));
+// Une erreur de base est journalisée sans arrêter l'API (/health reste disponible,
+// /health/db répond 503).
+connecter().catch(err => console.error('Mongo error', err.message));
 
 // Azure sets PORT itself. Never hardcode it.
 const PORT = process.env.PORT || 3000;
