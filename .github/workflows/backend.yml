@@ -62,3 +62,12 @@ jobs:
             sleep 15
           done
           echo "Health check failed"; exit 1
+      - name: Database check
+        run: |
+          for i in 1 2 3 4 5 6; do
+            code=$(curl -s -o body.json -w '%{http_code}' ${{ vars.AZURE_WEBAPP_URL }}/health/db || true)
+            echo "attempt $i -> $code $(cat body.json 2>/dev/null)"
+            [ "$code" = "200" ] && exit 0
+            sleep 15
+          done
+          echo "Database check failed: check MONGODB_URI in Azure and run npm run db:init"; exit 1
