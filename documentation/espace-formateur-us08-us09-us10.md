@@ -55,27 +55,36 @@ Chaque action a une fonction portant le même nom dans le contrôleur et le serv
 
 Le contrôleur récupère les paramètres de la requête et envoie la réponse. Le service vérifie le brouillon et les données, ajoute le chapitre puis appelle `formation.save()`. Les petites fonctions communes vérifient les textes et identifiants ou retrouvent un sous-document. Les fonctions `enregistrer` et `retrouver` du service fichiers gèrent le stockage ; la détection du format et la validation UTF-8 sont isolées pour faciliter leur lecture. Les erreurs passent par `ErreurApi` et le middleware `erreurs.js`.
 
-## Base de données locale persistante
+## Connexion à la base Azure Cosmos DB
 
-La base `capsavoir` est initialisée sur le serveur MongoDB installé comme service Windows, à l'adresse `mongodb://127.0.0.1:27017/capsavoir`. Ses sept collections et leurs index sont créés avec le script `npm.cmd run db:init` déjà présent dans le dépôt. Ce script ajoute les collections absentes sans supprimer les documents existants.
+La base utilisée pour le travail de l'équipe est désormais `capsavoir` sur Azure Cosmos DB, avec l'API MongoDB. Elle contient les sept collections : `Utilisateur`, `Formation`, `Quiz`, `Demande`, `Inscription`, `Tentative` et `Certificat`.
 
-Les données sont conservées dans le répertoire configuré par le service Windows MongoDB. Aucune instance temporaire ni aucun dossier de données MongoDB n'est créé dans le projet. Compass se connecte au même serveur avec `mongodb://127.0.0.1:27017` pour consulter la base.
+Le backend et Compass doivent se connecter à cette même base avec la chaîne MongoDB fournie par Azure. Les données de cette base sont stockées dans Cosmos DB. Le service MongoDB Windows n'a pas besoin d'être démarré pour utiliser Cosmos DB.
 
-Le fichier local `.env`, exclu de Git, contient la connexion et l'identifiant du profil formateur. Le fichier `.env.example` conserve des valeurs vides à adapter pour chaque machine :
+Le fichier local `codeBack/backend/.env`, exclu de Git, contient la connexion et l'identifiant du profil formateur. Pour une nouvelle machine, copier `.env.example` vers `.env` uniquement si ce dernier n'existe pas déjà, puis remplir :
 
-1. `MONGODB_URI` désigne la base `capsavoir` du service MongoDB.
-2. `FORMATEUR_ID` contient le `_id` du document `Utilisateur` ayant le rôle `FORMATEUR`.
-3. Le profil local « Formateur CapSavoir » (`formateur.local@capsavoir.test`) permet d'utiliser l'espace formateur. Son mot de passe est un hachage d'une valeur aléatoire non conservée ; ce profil n'a pas de connexion utilisateur utilisable.
+1. `MONGODB_URI` : copier la chaîne de connexion Azure, avec le nom de base `capsavoir`. Conserver ses paramètres, notamment `ssl=true`, `replicaSet=globaldb` et `retrywrites=false`, ainsi que `maxIdleTimeMS` et `appName` s'ils sont fournis.
+2. `FORMATEUR_ID` : dans Compass, ouvrir `capsavoir` puis `Utilisateur`, rechercher `{ "email": "formateur.test@capsavoir.test" }` et copier la valeur hexadécimale de `_id`, sans `ObjectId(...)`. Ce profil « Formateur Demonstration » possède le rôle `FORMATEUR` dans la base Cosmos DB.
+3. `PORT` : conserver `3000` pour le frontend local existant.
+4. `UPLOAD_DIR` : facultatif en local ; vide, il conserve les fichiers dans le dossier `uploads` du backend. Sur un serveur, choisir un dossier persistant.
+
+La vraie URI contient des identifiants d'accès à la base : elle reste uniquement dans `.env` ou dans les variables d'environnement du serveur. `.env.example` contient des instructions et un exemple fictif, sans clé ni mot de passe réel. Modifier la base dans `.env` nécessite de redémarrer le backend pour recharger la configuration.
+
+Le profil de démonstration a un mot de passe haché à partir d'une valeur aléatoire non conservée ; il n'a pas de connexion utilisateur utilisable.
 
 Aucun JWT ni écran de connexion n'est ajouté. En attendant US02/US03, toutes les routes du module utilisent le même profil défini côté serveur par `FORMATEUR_ID`. Ce contexte ne constitue pas une authentification : l'espace n'est pas destiné à être exposé publiquement avant intégration des droits utilisateurs.
 
-L'espace formateur enregistre les formations, chapitres et références de ressources dans MongoDB. Les fichiers téléversés restent dans le dossier `uploads` décrit plus bas. La liste des formations est initialement vide ; aucune formation de démonstration n'a été ajoutée lors de la configuration de la base.
+L'espace formateur enregistre les formations, chapitres et références de ressources dans Cosmos DB via Mongoose. Les fichiers téléversés restent dans le dossier `uploads` décrit plus bas. Une formation « Node.js et Angular - Formation de demonstration » a été créée depuis Angular et sa présence dans `capsavoir.Formation` a été vérifiée, avec le statut `BROUILLON`.
+
+### Option MongoDB sur le PC
+
+Pour travailler sur une base distincte installée sur le PC, utiliser `mongodb://127.0.0.1:27017/capsavoir` dans `.env` et un `FORMATEUR_ID` existant dans cette base locale. Le script `npm.cmd run db:init` crée les collections absentes et leurs index sans supprimer les documents existants. Il n'est pas nécessaire de l'exécuter pour la base Cosmos DB déjà initialisée de l'équipe.
 
 ## Lancement
 
 Avec Node 24 et les dépendances installées :
 
-Si le service MongoDB est arrêté, le démarrer depuis PowerShell ouvert en tant qu'administrateur :
+Avec la connexion Cosmos DB, lancer directement le backend. La commande suivante concerne uniquement l'option MongoDB installée sur le PC, si son service est arrêté ; elle s'exécute depuis PowerShell ouvert en tant qu'administrateur :
 
 ```powershell
 net start MongoDB
@@ -86,8 +95,10 @@ Puis lancer le backend dans un terminal normal :
 ```powershell
 cd C:\CapSavoirNodeProject\codeBack\backend
 npm.cmd ci
-npm.cmd run dev
+npm.cmd start
 ```
+
+`npm.cmd start` lance le serveur sans redémarrages automatiques pendant les essais de téléversement. `npm.cmd run dev` reste disponible pour développer avec surveillance des fichiers.
 
 Dans un autre terminal :
 
@@ -146,4 +157,4 @@ npm.cmd test -- --watch=false
 npm.cmd run build
 ```
 
-Les tests HTTP utilisent les modèles Mongoose et une persistance simulée en mémoire. Ils ne démarrent pas MongoDB et ne créent aucune base. Les fichiers de test sont temporaires et supprimés à la fin. Les tests Angular remplacent le service HTTP par des réponses contrôlées. Sur le service MongoDB local, la connexion aux sept collections et la lecture de la liste des formations ont également été vérifiées via l'API.
+Les tests HTTP utilisent les modèles Mongoose et une persistance simulée en mémoire. Ils ne démarrent pas MongoDB et ne créent aucune base. Les fichiers de test sont temporaires et supprimés à la fin. Les tests Angular remplacent le service HTTP par des réponses contrôlées. Sur Cosmos DB, la connexion aux sept collections, la lecture des formations via l'API et la présence de la formation créée depuis Angular ont également été vérifiées.

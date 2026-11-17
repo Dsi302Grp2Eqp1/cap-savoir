@@ -4,7 +4,7 @@ Online Learning Platform
 ## Espace formateur US08 US09 US10
 
 Module Angular/Express de création de formations, chapitres et ressources : [guide et configuration](documentation/espace-formateur-us08-us09-us10.md).
-La configuration du service MongoDB installé sur le PC est décrite dans le guide. Aucun JWT n'est ajouté par ce module.
+La configuration Azure Cosmos DB et du profil formateur est décrite dans le guide et dans `codeBack/backend/.env.example`. Le fichier `.env` contenant les identifiants reste privé. Aucun JWT n'est ajouté par ce module.
 
 ## Live URLs
 - Frontend (GitHub Pages): https://dsi302grp2eqp1.github.io/cap-savoir/
