@@ -34,7 +34,7 @@ CAP.creer("Formation", {
               properties: {
                 _id:     { bsonType: "objectId" },
                 titre:   { bsonType: "string", minLength: 1 },
-                type:    { enum: ["VIDEO", "PDF", "TEXTE", "IMAGE", "PRESENTATION"] },  // US10
+                type:    { enum: ["VIDEO", "PDF", "DOCUMENT", "TEXTE", "IMAGE", "PRESENTATION"] },  // US10
                 contenu: CAP.fichier,
                 ordre:   { bsonType: "number", minimum: 1 }
               }

@@ -1,1 +1,81 @@
-/* You can add global styles to this file, and also import other style files */
+@import './app/features/formateur/styles/formateur.css';
+
+:root {
+  /* Palette CapSavoir issue de la charte graphique. */
+  --couleur-principale: #6c3cf5;
+  --couleur-survol: #5122d4;
+  --couleur-lavande: #eee9ff;
+  --couleur-fond: #f7f8fc;
+  --couleur-surface: #ffffff;
+  --couleur-texte: #202438;
+  --couleur-secondaire: #70778b;
+  --couleur-succes: #00a884;
+  --couleur-erreur: #e5484d;
+  --couleur-bordure: #e7e9f2;
+  --couleur-fond-champ: #fcfcfe;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Champs partagés des écrans formateur. */
+app-espace-formateur {
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 650;
+    margin: 18px 0 8px;
+  }
+  label small {
+    display: inline;
+    font-weight: 400;
+  }
+  input,
+  textarea,
+  select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 7px;
+    background: var(--couleur-fond-champ);
+    color: var(--couleur-texte);
+    font: inherit;
+    font-size: 14px;
+  }
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: 2px solid var(--couleur-principale);
+    outline-offset: 1px;
+  }
+  textarea {
+    resize: vertical;
+  }
+  fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+}
+body {
+  margin: 0;
+  background: var(--couleur-fond);
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+  color: var(--couleur-texte);
+}
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+button,
+a,
+input,
+textarea,
+select,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}

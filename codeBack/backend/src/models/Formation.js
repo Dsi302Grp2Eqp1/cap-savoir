@@ -4,7 +4,7 @@ const { fichierSchema, resumePersonneSchema, auMoins, options } = require('./_co
 
 const ressourceSchema = new Schema({            // _id ajouté automatiquement
   titre:   { type: String, required: true, minlength: 1 },
-  type:    { type: String, required: true, enum: ['VIDEO', 'PDF', 'TEXTE', 'IMAGE', 'PRESENTATION'] }, // US10
+  type:    { type: String, required: true, enum: ['VIDEO', 'PDF', 'DOCUMENT', 'TEXTE', 'IMAGE', 'PRESENTATION'] }, // US10
   contenu: { type: fichierSchema, required: true },
   ordre:   { type: Number, required: true, min: 1 }
 });
@@ -28,7 +28,7 @@ const formationSchema = new Schema({
   formateur:    { type: resumePersonneSchema, required: true },
   // vide en brouillon ; au moins 1 chapitre exigé à la soumission (code applicatif, US11)
   chapitres:    { type: [chapitreSchema], default: [] }
-}, options('Formation'));
+}, { ...options('Formation'), versionKey: '__v', optimisticConcurrency: true });
 
 formationSchema.index({ statut: 1, categories: 1, prix: 1 }); // US16 catalogue + filtres
 // Cosmos DB ne gère pas les index "text" : la recherche (US16, US40) se fait par

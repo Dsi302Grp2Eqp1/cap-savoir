@@ -1,0 +1,14 @@
+<section class="panel summary">
+  @if (couverture) {
+    <img class="cover" [src]="couverture" [alt]="formation.titre" />
+  }
+  <div>
+    <span class="tag">{{ formation.statut }}</span>
+    <h3>{{ formation.titre }}</h3>
+    <p class="description">{{ formation.description }}</p>
+    <p class="muted">
+      {{ formation.categories.join(' · ') }} · {{ formation.prix | number: '1.2-2' }} TND
+    </p>
+    <small>Couverture : {{ formation.image.nom }}</small>
+  </div>
+</section>

@@ -1,0 +1,93 @@
+<div class="intro">
+  <div>
+    <span class="eyebrow">ESPACE FORMATEUR</span>
+    <h2>Partagez ce que vous savez.</h2>
+    <p>Créez votre formation et construisez votre parcours pédagogique.</p>
+  </div>
+  <button type="button" (click)="nouvelle()" [disabled]="charge()">+ Nouvelle formation</button>
+</div>
+@if (erreur()) {
+  <div class="notice error" role="alert">{{ erreur() }}</div>
+}
+@if (message()) {
+  <div class="notice success" role="status">{{ message() }}</div>
+}
+@if (charge()) {
+  <p class="loading" role="status">Traitement en cours…</p>
+}
+
+<div class="layout" [attr.aria-busy]="charge()">
+  <app-liste-formations
+    [formations]="formations()"
+    [selectionId]="selection()?._id"
+    [charge]="charge()"
+    (actualiser)="actualiser()"
+    (selectionner)="ouvrir($event)"
+  />
+  <main>
+    @if (creation()) {
+      <app-formation-formulaire
+        [formulaire]="formulaire"
+        [image]="image"
+        [charge]="charge()"
+        (enregistrer)="creerFormation()"
+        (imageChoisie)="choisirImage($event)"
+      />
+    } @else if (selection(); as formation) {
+      <app-formation-resume [formation]="formation" [couverture]="couverture()" />
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">02 / PARCOURS PÉDAGOGIQUE</span>
+          <h3>Les chapitres de votre formation</h3>
+        </div>
+        <span class="count">{{ formation.chapitres.length }} chapitre(s)</span>
+      </div>
+      @if (formation.statut !== 'BROUILLON') {
+        <p class="notice">
+          Cette formation est en lecture seule. Seuls les brouillons sont modifiables.
+        </p>
+      }
+      <fieldset class="editor" [disabled]="charge() || formation.statut !== 'BROUILLON'">
+        @for (chapitre of formation.chapitres; track chapitre._id; let i = $index) {
+          <app-chapitre-editeur
+            [chapitre]="chapitre"
+            [brouillon]="chapitres[chapitre._id]"
+            [index]="i"
+            [total]="formation.chapitres.length"
+            (enregistrer)="enregistrerChapitre(chapitre)"
+            (supprimer)="supprimerChapitre(chapitre)"
+            (deplacer)="deplacerChapitre(i, $event)"
+          >
+            <app-ressources-chapitre
+              [chapitre]="chapitre"
+              [brouillon]="ressources[chapitre._id]"
+              [version]="fichiersReinitialises()"
+              (ajouter)="ajouterRessource(chapitre)"
+              (fichierChoisi)="choisirRessource(chapitre._id, $event)"
+              (supprimer)="supprimerRessource(chapitre, $event)"
+              (telecharger)="telecharger($event)"
+              (deplacer)="deplacerRessource(chapitre, $event.index, $event.direction)"
+            />
+          </app-chapitre-editeur>
+        } @empty {
+          <div class="empty panel">
+            <h4>Construisez votre premier chapitre</h4>
+            <p>Un chapitre regroupe les ressources autour d'un même sujet.</p>
+          </div>
+        }
+        <app-chapitre-formulaire [formulaire]="nouveauChapitre" (ajouter)="ajouterChapitre()" />
+      </fieldset>
+    } @else {
+      <section class="panel empty welcome">
+        <span class="eyebrow">VOTRE SAVOIR A DE LA VALEUR</span>
+        <h3>Votre prochaine formation commence ici.</h3>
+        <p>
+          Un titre, une idée, puis des chapitres et des ressources pour accompagner vos apprenants.
+        </p>
+        <button type="button" (click)="nouvelle()" [disabled]="charge()">
+          Créer une formation
+        </button>
+      </section>
+    }
+  </main>
+</div>

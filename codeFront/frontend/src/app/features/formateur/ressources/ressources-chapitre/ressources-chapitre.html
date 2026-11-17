@@ -1,0 +1,102 @@
+<div class="resources">
+  <h5>Ressources pédagogiques</h5>
+  @for (ressource of chapitre.ressources; track ressource._id; let r = $index) {
+    <div class="resource">
+      <span class="file-type">{{ libelles[ressource.type] }}</span>
+      <div class="file-info">
+        <strong>{{ ressource.titre }}</strong><small
+          >{{ ressource.contenu.nom }} ·
+          {{ ressource.contenu.taille / 1024 | number: '1.0-1' }} Ko</small
+        >
+      </div>
+      <div class="tools">
+        <button
+          class="quiet"
+          type="button"
+          (click)="telecharger.emit(ressource)"
+          aria-label="Télécharger la ressource"
+        >
+          ↓ Fichier</button
+        ><button
+          class="quiet"
+          type="button"
+          [disabled]="r === 0"
+          (click)="deplacer.emit({ index: r, direction: -1 })"
+          aria-label="Monter la ressource"
+        >
+          ↑</button
+        ><button
+          class="quiet"
+          type="button"
+          [disabled]="r === chapitre.ressources.length - 1"
+          (click)="deplacer.emit({ index: r, direction: 1 })"
+          aria-label="Descendre la ressource"
+        >
+          ↓</button
+        ><button
+          class="danger quiet"
+          type="button"
+          (click)="supprimer.emit(ressource)"
+          aria-label="Supprimer la ressource"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  } @empty {
+    <p class="muted">Ajoutez la première ressource de ce chapitre.</p>
+  }
+  <details>
+    <summary>+ Ajouter une ressource</summary>
+    <form #ressourceForm="ngForm" (ngSubmit)="ajouter.emit()">
+      <label [for]="'rt-' + chapitre._id">Titre de la ressource</label
+      ><input
+        [id]="'rt-' + chapitre._id"
+        name="titre"
+        [(ngModel)]="brouillon.titre"
+        required
+        maxlength="200"
+      /><label [for]="'type-' + chapitre._id">Type</label
+      ><select
+        [id]="'type-' + chapitre._id"
+        name="type"
+        [(ngModel)]="brouillon.type"
+        (ngModelChange)="brouillon.fichier = undefined"
+      >
+        @for (type of types; track type) {
+          <option [value]="type">{{ libelles[type] }}</option>
+        }
+      </select>
+      @if (brouillon.type === 'TEXTE') {
+        <label [for]="'texte-' + chapitre._id">Contenu</label
+        ><textarea
+          [id]="'texte-' + chapitre._id"
+          name="texte"
+          [(ngModel)]="brouillon.texte"
+          required
+          rows="5"
+          maxlength="100000"
+          placeholder="Rédigez votre contenu pédagogique…"
+        ></textarea>
+      } @else {
+        @for (cleFichier of [version + brouillon.type]; track cleFichier) {
+          <label [for]="'fichier-' + chapitre._id">Fichier</label
+          ><input
+            [id]="'fichier-' + chapitre._id"
+            type="file"
+            [accept]="formats[brouillon.type]"
+            (change)="fichierChoisi.emit($event)"
+          /><small>Formats : {{ formats[brouillon.type] }} · 50 Mo maximum.</small>
+        }
+      }
+      <div class="actions">
+        <button
+          type="submit"
+          [disabled]="ressourceForm.invalid || (brouillon.type !== 'TEXTE' && !brouillon.fichier)"
+        >
+          Ajouter au chapitre
+        </button>
+      </div>
+    </form>
+  </details>
+</div>

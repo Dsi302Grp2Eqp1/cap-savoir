@@ -1,0 +1,22 @@
+<section class="panel new-chapter">
+  <h4>+ Ajouter un chapitre</h4>
+  <form #nouveauForm="ngForm" (ngSubmit)="ajouter.emit()">
+    <label for="nouveau-titre">Titre</label
+    ><input
+      id="nouveau-titre"
+      name="titre"
+      [(ngModel)]="formulaire.titre"
+      required
+      maxlength="200"
+      placeholder="Ex. Installer son environnement"
+    /><label for="nouvelle-description">Description <small>(facultative)</small></label
+    ><textarea
+      id="nouvelle-description"
+      name="description"
+      [(ngModel)]="formulaire.description"
+      maxlength="5000"
+      rows="2"
+    ></textarea
+    ><button type="submit" [disabled]="nouveauForm.invalid">Ajouter le chapitre</button>
+  </form>
+</section>
