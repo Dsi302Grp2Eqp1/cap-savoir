@@ -1,4 +1,5 @@
 @import './app/features/formateur/styles/formateur.css';
+@import './app/features/auth/styles/auth.css';
 
 :root {
   /* Palette CapSavoir issue de la charte graphique. */

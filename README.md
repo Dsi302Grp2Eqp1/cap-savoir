@@ -1,6 +1,11 @@
 # cap-savoir
 Online Learning Platform
 
+## Authentification et rôles US01 US02 US03
+
+Inscription, connexion/déconnexion par JWT et espaces par rôle, avec les middlewares `authentifier` / `exigerRole` à réutiliser : [guide et configuration](documentation/auth-us01-us02-us03.md).
+`JWT_SECRET` doit être défini dans `.env` (local) et dans les variables d'environnement Azure (production).
+
 ## Espace formateur US08 US09 US10
 
 Module Angular/Express de création de formations, chapitres et ressources : [guide et configuration](documentation/espace-formateur-us08-us09-us10.md).

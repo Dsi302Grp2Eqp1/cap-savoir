@@ -57,11 +57,62 @@ h1 {
 .dot.offline {
   background: var(--couleur-erreur);
 }
-@media (max-width: 600px) {
+/* US03 : menu des espaces et zone utilisateur. */
+nav {
+  display: flex;
+  gap: 6px;
+}
+nav a,
+.header-right a,
+.lien-bouton {
+  padding: 7px 12px;
+  border-radius: 8px;
+  color: var(--couleur-texte);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+nav a:hover,
+.header-right a:hover,
+.lien-bouton:hover {
+  background: var(--couleur-lavande);
+}
+nav a.actif,
+.header-right a.actif {
+  background: var(--couleur-lavande);
+  color: var(--couleur-principale);
+}
+.header-right .lien-principal {
+  background: var(--couleur-principale);
+  color: var(--couleur-surface);
+}
+.header-right .lien-principal:hover {
+  background: var(--couleur-survol);
+}
+.utilisateur {
+  color: var(--couleur-texte);
+  font-weight: 600;
+}
+.utilisateur small {
+  color: var(--couleur-secondaire);
+  font-weight: 400;
+}
+.lien-bouton {
+  border: 1px solid var(--couleur-bordure);
+  background: transparent;
+  cursor: pointer;
+}
+@media (max-width: 800px) {
   header {
+    flex-wrap: wrap;
     padding: 16px 20px;
+    gap: 12px;
   }
-  .header-right > span:first-child {
+  .status,
+  .utilisateur small {
     display: none;
+  }
+  .header-right {
+    gap: 8px;
   }
 }
