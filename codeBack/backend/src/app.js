@@ -27,6 +27,7 @@ app.get('/health/db', async (req, res) => {
   }
 });
 
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/formations', require('./routes/formations'));
 app.use('/api/fichiers', require('./routes/fichiers'));
 app.use((req, res) => res.status(404).json({ erreur: 'Route introuvable.' }));

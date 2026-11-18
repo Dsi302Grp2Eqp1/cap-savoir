@@ -1,20 +1,42 @@
 <header>
-  <a class="brand" href="./"
-    ><span class="brand-mark">C</span>
-    <h1>{{ title() }}</h1></a
-  >
+  <a class="brand" routerLink="/">
+    <span class="brand-mark">C</span>
+    <h1>{{ title() }}</h1>
+  </a>
+
+  <!-- US03 : le menu affiche uniquement les espaces des rôles de l'utilisateur. -->
+  @if (auth.espaces().length > 1) {
+    <nav aria-label="Espaces">
+      @for (espace of auth.espaces(); track espace.role) {
+        <a [routerLink]="espace.chemin" routerLinkActive="actif">{{ espace.libelle }}</a>
+      }
+    </nav>
+  }
+
   <div class="header-right">
-    <span>Espace formateur</span
-    ><span class="status" aria-label="État de l’API"
-      ><span class="dot" [class]="apiStatus()"></span
-      >{{
+    <span class="status" aria-label="État de l’API">
+      <span class="dot" [class]="apiStatus()"></span>
+      {{
         apiStatus() === 'online'
           ? 'API connectée'
           : apiStatus() === 'offline'
             ? 'API indisponible'
             : 'Connexion…'
-      }}</span
-    >
+      }}
+    </span>
+
+    @if (auth.utilisateur(); as utilisateur) {
+      <span class="utilisateur">
+        {{ utilisateur.prenom }} {{ utilisateur.nom }}
+        @if (auth.espaces().length === 1) {
+          <small>· {{ auth.espaces()[0].libelle }}</small>
+        }
+      </span>
+      <button type="button" class="lien-bouton" (click)="deconnecter()">Se déconnecter</button>
+    } @else {
+      <a routerLink="/connexion" routerLinkActive="actif">Se connecter</a>
+      <a routerLink="/inscription" class="lien-principal">Créer un compte</a>
+    }
   </div>
 </header>
 

@@ -9,6 +9,7 @@ CAP.creer("Utilisateur", {
     prenom:       { bsonType: "string", minLength: 1 },
     email:        { bsonType: "string", pattern: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$" },
     motDePasse:   { bsonType: "string", minLength: 1, description: "hachage produit par le backend" },
+    versionJeton: { bsonType: "number", minimum: 0, description: "incrémentée à la déconnexion (US02)" },
     dateCreation: { bsonType: "date" },
     roles: {
       bsonType: "array", minItems: 1, uniqueItems: true,

@@ -11,7 +11,11 @@ const utilisateurSchema = new Schema({
     type: String, required: true, lowercase: true, trim: true,
     match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   },
-  motDePasse:   { type: String, required: true, minlength: 1 }, // hachage produit par le backend
+  // Hachage bcrypt produit par le backend. Jamais renvoyé par défaut :
+  // le lire explicitement avec .select('+motDePasse').
+  motDePasse:   { type: String, required: true, minlength: 1, select: false },
+  // Incrémenté à la déconnexion (US02) : les jetons émis avant deviennent invalides.
+  versionJeton: { type: Number, default: 0, min: 0 },
   dateCreation: { type: Date, required: true, default: Date.now },
   roles: {
     type: [{ type: String, enum: ['APPRENANT', 'FORMATEUR', 'AGENT'] }],

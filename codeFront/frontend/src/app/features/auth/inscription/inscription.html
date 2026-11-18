@@ -1,0 +1,97 @@
+<section class="auth-carte">
+  <span class="eyebrow">INSCRIPTION</span>
+  <h2>Créer votre compte</h2>
+  <p class="muted">Tous les champs sont obligatoires.</p>
+
+  @if (erreur()) {
+    <p class="notice error" role="alert">{{ erreur() }}</p>
+  }
+
+  <form #form="ngForm" (ngSubmit)="form.valid && inscrire()" novalidate>
+    <fieldset [disabled]="charge()">
+      <div class="two-cols">
+        <div>
+          <label for="prenom">Prénom</label>
+          <input
+            id="prenom"
+            name="prenom"
+            autocomplete="given-name"
+            [(ngModel)]="formulaire.prenom"
+            required
+            maxlength="100"
+            #champPrenom="ngModel"
+          />
+          @if (champPrenom.invalid && (champPrenom.touched || form.submitted)) {
+            <small class="champ-erreur">Prénom obligatoire.</small>
+          }
+        </div>
+        <div>
+          <label for="nom">Nom</label>
+          <input
+            id="nom"
+            name="nom"
+            autocomplete="family-name"
+            [(ngModel)]="formulaire.nom"
+            required
+            maxlength="100"
+            #champNom="ngModel"
+          />
+          @if (champNom.invalid && (champNom.touched || form.submitted)) {
+            <small class="champ-erreur">Nom obligatoire.</small>
+          }
+        </div>
+      </div>
+
+      <label for="email">Email</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        autocomplete="email"
+        [(ngModel)]="formulaire.email"
+        required
+        email
+        maxlength="254"
+        #champEmail="ngModel"
+      />
+      @if (champEmail.invalid && (champEmail.touched || form.submitted)) {
+        <small class="champ-erreur">Saisissez un email valide.</small>
+      }
+
+      <label for="motDePasse">Mot de passe</label>
+      <input
+        id="motDePasse"
+        name="motDePasse"
+        type="password"
+        autocomplete="new-password"
+        [(ngModel)]="formulaire.motDePasse"
+        required
+        maxlength="72"
+        #champMdp="ngModel"
+      />
+      <small [class.champ-erreur]="(champMdp.touched || form.submitted) && !motDePasseValide()">
+        Au moins {{ longueurMin }} caractères, dont une lettre et un chiffre.
+      </small>
+
+      <label for="confirmation">Confirmer le mot de passe</label>
+      <input
+        id="confirmation"
+        name="confirmation"
+        type="password"
+        autocomplete="new-password"
+        [(ngModel)]="confirmation"
+        required
+        #champConfirmation="ngModel"
+      />
+      @if ((champConfirmation.touched || form.submitted) && !confirmationValide()) {
+        <small class="champ-erreur">Les mots de passe ne correspondent pas.</small>
+      }
+
+      <button class="bouton" type="submit">
+        {{ charge() ? 'Création…' : 'Créer mon compte' }}
+      </button>
+    </fieldset>
+  </form>
+
+  <p class="bas-carte">Déjà inscrit ? <a routerLink="/connexion">Se connecter</a></p>
+</section>

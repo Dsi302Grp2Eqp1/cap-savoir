@@ -1,7 +1,8 @@
 const router = require('express').Router();
-const { formateur } = require('../middlewares/contexte-formateur');
+const { authentifier, exigerRole } = require('../middlewares/authentification');
 const controller = require('../controllers/formations');
-router.use(formateur);
+// US03 : réservé aux formateurs connectés ; req.utilisateur est le formateur courant.
+router.use(authentifier, exigerRole('FORMATEUR'));
 
 // Formations
 router.get('/', controller.lister);
