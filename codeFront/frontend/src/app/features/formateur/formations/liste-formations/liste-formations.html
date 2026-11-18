@@ -1,0 +1,29 @@
+<aside class="panel">
+  <div class="panel-title">
+    <h3>Mes formations</h3>
+    <button
+      class="quiet"
+      type="button"
+      (click)="actualiser.emit()"
+      [disabled]="charge"
+      aria-label="Actualiser les formations"
+    >
+      ↻
+    </button>
+  </div>
+  @for (formation of formations; track formation._id) {
+    <button
+      class="formation"
+      type="button"
+      [class.active]="selectionId === formation._id"
+      [disabled]="charge"
+      (click)="selectionner.emit(formation._id)"
+    >
+      <span class="tag">{{ formation.statut }}</span><strong>{{ formation.titre }}</strong
+      ><small>{{ formation.categories.join(' · ') }}</small
+      ><span>{{ formation.prix | number: '1.2-2' }} TND</span>
+    </button>
+  } @empty {
+    <p class="muted">Vos formations apparaîtront ici.</p>
+  }
+</aside>

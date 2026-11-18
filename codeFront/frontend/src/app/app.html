@@ -1,6 +1,21 @@
 <header>
-  <h1>{{ title() }}</h1>
-  <p class="status">API : <strong [class]="apiStatus()">{{ apiStatus() }}</strong></p>
+  <a class="brand" href="./"
+    ><span class="brand-mark">C</span>
+    <h1>{{ title() }}</h1></a
+  >
+  <div class="header-right">
+    <span>Espace formateur</span
+    ><span class="status" aria-label="État de l’API"
+      ><span class="dot" [class]="apiStatus()"></span
+      >{{
+        apiStatus() === 'online'
+          ? 'API connectée'
+          : apiStatus() === 'offline'
+            ? 'API indisponible'
+            : 'Connexion…'
+      }}</span
+    >
+  </div>
 </header>
 
 <router-outlet />
