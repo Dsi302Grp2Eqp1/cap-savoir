@@ -60,21 +60,13 @@ Côté Angular, une route se protège avec `canActivate: [roleGuard('FORMATEUR')
 
 ### Espace formateur (P2)
 
-`/formateur` est réservé au rôle `FORMATEUR` côté Angular. Les routes `/api/formations` et `/api/fichiers` utilisent encore le profil fixe `FORMATEUR_ID`. Pour les rattacher au formateur connecté, remplacer dans `routes/formations.js` et `routes/fichiers.js` :
+`/formateur` est réservé au rôle `FORMATEUR` côté Angular, et `/api/formations` et `/api/fichiers` côté API :
 
 ```js
-const { formateur } = require('../middlewares/contexte-formateur');
-router.use(formateur);
-```
-
-par :
-
-```js
-const { authentifier, exigerRole } = require('../middlewares/authentification');
 router.use(authentifier, exigerRole('FORMATEUR'));
 ```
 
-Ce changement est à faire par P2, en accord avec l'équipe, dans une PR séparée.
+Chaque formation et chaque fichier est rattaché au formateur connecté (`req.utilisateur`). L'ancien profil fixe `FORMATEUR_ID` et le middleware temporaire `contexte-formateur.js` sont supprimés : la variable `FORMATEUR_ID` peut être retirée de `.env` et d'Azure.
 
 ## Configuration
 

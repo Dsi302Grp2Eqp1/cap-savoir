@@ -9,6 +9,7 @@ const path = require('node:path');
 const { Types } = require('mongoose');
 const { Formation, Utilisateur } = require('../src/models');
 const app = require('../src/app');
+const { signer } = require('../src/utils/jeton');
 
 test('US08/09/10 : parcours HTTP sans base de données', async (t) => {
   const sauvegarde = { ...process.env };
@@ -20,7 +21,9 @@ test('US08/09/10 : parcours HTTP sans base de données', async (t) => {
     prenom: 'Formateur',
     roles: ['FORMATEUR'],
   };
-  process.env.FORMATEUR_ID = String(personne._id);
+  // Formateur connecté (US02/US03) : jeton signé pour ce profil.
+  process.env.JWT_SECRET = 'secret-de-test-uniquement';
+  let jeton = signer(personne);
   const documents = new Map();
   t.mock.method(Utilisateur, 'findById', (id) => ({
     select: async () => (id === String(personne._id) ? personne : null),
@@ -53,9 +56,11 @@ test('US08/09/10 : parcours HTTP sans base de données', async (t) => {
   await once(serveur, 'listening');
   const base = `http://127.0.0.1:${serveur.address().port}`;
   async function requete(methode, url, body, statut = 200) {
+    const headers = body && !(body instanceof FormData) ? { 'Content-Type': 'application/json' } : {};
+    if (jeton) headers.Authorization = `Bearer ${jeton}`;
     const reponse = await fetch(base + url, {
       method: methode,
-      headers: body && !(body instanceof FormData) ? { 'Content-Type': 'application/json' } : {},
+      headers,
       body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body),
     });
     assert.equal(reponse.status, statut, `${methode} ${url} : ${await reponse.clone().text()}`);
@@ -68,10 +73,12 @@ test('US08/09/10 : parcours HTTP sans base de données', async (t) => {
   }
   let formation, image;
   try {
-    await t.test('configuration absente ou profil non formateur', async () => {
-      delete process.env.FORMATEUR_ID;
-      await requete('GET', '/api/formations', undefined, 503);
-      process.env.FORMATEUR_ID = String(personne._id);
+    await t.test('non connecté ou profil non formateur', async () => {
+      const valide = jeton;
+      jeton = null;
+      await requete('GET', '/api/formations', undefined, 401);
+      await requete('GET', '/api/fichiers/x/y', undefined, 401);
+      jeton = valide;
       personne.roles = ['APPRENANT'];
       await requete('GET', '/api/formations', undefined, 403);
       personne.roles = ['FORMATEUR'];
@@ -90,7 +97,9 @@ test('US08/09/10 : parcours HTTP sans base de données', async (t) => {
         await upload('TEXTE', Buffer.from([0xc3, 0x28]), 'encodage-invalide.txt', 400);
         await upload('TEXTE', png, 'image-deguisee.txt', 400);
         await upload('PDF', png, 'faux.pdf', 400);
-        assert.equal((await fetch(base + image.url)).status, 200);
+        const telechargement = (enTetes) => fetch(base + image.url, { headers: enTetes });
+        assert.equal((await telechargement({ Authorization: `Bearer ${jeton}` })).status, 200);
+        assert.equal((await telechargement({})).status, 401, 'téléchargement réservé au formateur connecté');
         const autreId = String(new Types.ObjectId());
         await requete('GET', image.url.replace(String(personne._id), autreId), undefined, 404);
       },
@@ -239,7 +248,7 @@ test('US08/09/10 : parcours HTTP sans base de données', async (t) => {
     serveur.closeAllConnections();
     await new Promise((resolve) => serveur.close(resolve));
     await fs.rm(repertoire, { recursive: true, force: true });
-    for (const nom of ['UPLOAD_DIR', 'FORMATEUR_ID']) {
+    for (const nom of ['UPLOAD_DIR', 'JWT_SECRET']) {
       if (sauvegarde[nom] === undefined) delete process.env[nom];
       else process.env[nom] = sauvegarde[nom];
     }
