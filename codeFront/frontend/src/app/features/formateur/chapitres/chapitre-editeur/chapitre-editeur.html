@@ -1,0 +1,46 @@
+<article class="panel chapter">
+  <div class="chapter-heading">
+    <span class="number">{{ chapitre.ordre }}</span>
+    <h4>{{ chapitre.titre }}</h4>
+    <div class="tools">
+      <button
+        type="button"
+        class="quiet"
+        [disabled]="index === 0"
+        (click)="deplacer.emit(-1)"
+        aria-label="Monter le chapitre"
+      >
+        ↑</button
+      ><button
+        type="button"
+        class="quiet"
+        [disabled]="index === total - 1"
+        (click)="deplacer.emit(1)"
+        aria-label="Descendre le chapitre"
+      >
+        ↓</button
+      ><button type="button" class="danger quiet" (click)="supprimer.emit()">Supprimer</button>
+    </div>
+  </div>
+  <form #chapitreForm="ngForm" (ngSubmit)="enregistrer.emit()">
+    <label [for]="'ct-' + chapitre._id">Titre du chapitre</label
+    ><input
+      [id]="'ct-' + chapitre._id"
+      name="titre"
+      [(ngModel)]="brouillon.titre"
+      required
+      maxlength="200"
+    /><label [for]="'cd-' + chapitre._id">Description <small>(facultative)</small></label
+    ><textarea
+      [id]="'cd-' + chapitre._id"
+      name="description"
+      [(ngModel)]="brouillon.description"
+      rows="2"
+      maxlength="5000"
+    ></textarea
+    ><button class="secondary" type="submit" [disabled]="chapitreForm.invalid">
+      Enregistrer le chapitre
+    </button>
+  </form>
+  <ng-content />
+</article>

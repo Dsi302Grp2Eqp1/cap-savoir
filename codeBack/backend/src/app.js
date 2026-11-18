@@ -7,7 +7,7 @@ const app = express();
 
 // Origin is the domain only, without the /cap-savoir path.
 app.use(cors({
-  origin: ['https://dsi302grp2eqp1.github.io', 'http://localhost:4200'],
+  origin: ['https://dsi302grp2eqp1.github.io', 'http://localhost:4200', 'http://127.0.0.1:4200'],
   credentials: true
 }));
 app.use(express.json());
@@ -27,8 +27,10 @@ app.get('/health/db', async (req, res) => {
   }
 });
 
-// Mount feature routes here, e.g.:
-// app.use('/api/formations', require('./routes/formations'));
-app.use('/api/paiements', require('./routes/paiements'));//us18 ghofrane
+app.use('/api/formations', require('./routes/formations'));
+app.use('/api/fichiers', require('./routes/fichiers'));
+app.use('/api/paiements', require('./routes/paiements')); // US18
+app.use((req, res) => res.status(404).json({ erreur: 'Route introuvable.' }));
+app.use(require('./middlewares/erreurs'));
 
 module.exports = app;
