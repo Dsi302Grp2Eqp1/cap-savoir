@@ -4,8 +4,8 @@ const { Formation, Inscription } = require('../models');
 const passerelle = require('../services/passerelle');
 
 const router = express.Router();
-const FRONT_URL = () => process.env.FRONT_URL || 'http://localhost:4200';
-const REFERENCE = /^[0-9a-f]{24}$/;
+
+
 
 // Traite la notification de la passerelle. Idempotent. Retourne un code HTTP.
 async function traiterNotification(reference) {
@@ -30,26 +30,7 @@ async function traiterNotification(reference) {
 }
 
 // --- MOCK (désactivé en production) : page de la fausse passerelle ---
-if (process.env.NODE_ENV !== 'production') {
-  router.get('/mock/:reference', (req, res) => {
-    const { reference } = req.params;
-    if (!REFERENCE.test(reference)) return res.sendStatus(400);
-    res.send(`<h1>Passerelle fictive</h1>
-      <p><a href="/api/paiements/mock/${reference}/CONFIRME">Payer</a></p>
-      <p><a href="/api/paiements/mock/${reference}/ECHOUE">Annuler / échec</a></p>`);
-  });
 
-  router.get('/mock/:reference/:resultat', async (req, res) => {
-    const { reference, resultat } = req.params;
-    if (!REFERENCE.test(reference) || !['CONFIRME', 'ECHOUE'].includes(resultat)) {
-      return res.sendStatus(400);
-    }
-    if (!passerelle.simuler(reference, resultat)) return res.sendStatus(404);
-    await traiterNotification(reference); // simule l'appel du webhook par la passerelle
-    // Retour de l'apprenant vers la page du frontend, qui lit ensuite /:paiementId/statut
-    res.redirect(`${FRONT_URL()}/paiement/resultat?ref=${reference}`);
-  });
-}
 
 // POST /api/paiements/checkout  { formationId }
 // Nécessite l'authentification (US02) : elle doit renseigner req.utilisateur._id.
@@ -81,7 +62,7 @@ router.post('/checkout', async (req, res) => {
 
   const paiementId = new Types.ObjectId();
   const session = await passerelle.creerSession({
-    reference: String(paiementId), montant: formation.prix, titre: formation.titre
+    paiementId: String(paiementId), montant: formation.prix, titre: formation.titre
   });
 
   await Inscription.updateOne({ _id: inscription._id }, {
@@ -95,12 +76,17 @@ router.post('/checkout', async (req, res) => {
   res.status(201).json({ url: session.url, paiementId });
 });
 
-// POST /api/paiements/webhook : public, appelé par la passerelle.
-router.post('/webhook', async (req, res) => {
-  const reference = req.body?.reference;
-  if (typeof reference !== 'string') return res.sendStatus(400);
+// Appelé par Stripe (route montée dans app.js avec le corps brut).
+async function webhook(req, res) {
+  let reference;
+  try {
+    reference = passerelle.lireEvenement(req.body, req.headers['stripe-signature']);
+  } catch {
+    return res.sendStatus(400); // signature invalide
+  }
+  if (!reference) return res.sendStatus(200); // événement ignoré
   res.sendStatus(await traiterNotification(reference));
-});
+}
 
 // GET /api/paiements/:paiementId/statut : confirmation affichée à l'apprenant.
 router.get('/:paiementId/statut', async (req, res) => {
@@ -112,13 +98,28 @@ router.get('/:paiementId/statut', async (req, res) => {
     return res.status(400).json({ erreur: 'paiementId invalide' });
   }
   // Un apprenant ne voit que ses propres paiements.
-  const inscription = await Inscription.findOne(
+  const lire = () => Inscription.findOne(
     { apprenantId, 'paiements._id': paiementId }
   ).lean();
-  if (!inscription) return res.sendStatus(404);
+  const trouver = (insc) => insc.paiements.find(p => String(p._id) === paiementId);
 
-  const paiement = inscription.paiements.find(p => String(p._id) === paiementId);
+  let inscription = await lire();
+  if (!inscription) return res.sendStatus(404);
+  let paiement = trouver(inscription);
+
+  // Hors cours : sans webhook (exécution locale), on interroge la passerelle
+  // au retour de l'apprenant. Même vérification serveur à serveur que le webhook.
+  if (paiement.statut === 'EN_ATTENTE') {
+    try {
+      await traiterNotification(paiement.referenceTransaction);
+      inscription = await lire();
+      paiement = trouver(inscription);
+    } catch (err) {
+      console.error('verification paiement', err.message); // on garde le statut actuel
+    }
+  }
   res.json({ paiement: paiement.statut, inscription: inscription.statut });
 });
 
 module.exports = router;
+module.exports.webhook = webhook;
