@@ -29,5 +29,6 @@ app.get('/health/db', async (req, res) => {
 
 // Mount feature routes here, e.g.:
 // app.use('/api/formations', require('./routes/formations'));
+app.use('/api/paiements', require('./routes/paiements'));//us18 ghofrane
 
 module.exports = app;
