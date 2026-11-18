@@ -61,24 +61,24 @@ La base utilisée pour le travail de l'équipe est désormais `capsavoir` sur Az
 
 Le backend et Compass doivent se connecter à cette même base avec la chaîne MongoDB fournie par Azure. Les données de cette base sont stockées dans Cosmos DB. Le service MongoDB Windows n'a pas besoin d'être démarré pour utiliser Cosmos DB.
 
-Le fichier local `codeBack/backend/.env`, exclu de Git, contient la connexion et l'identifiant du profil formateur. Pour une nouvelle machine, copier `.env.example` vers `.env` uniquement si ce dernier n'existe pas déjà, puis remplir :
+Le fichier local `codeBack/backend/.env`, exclu de Git, contient la connexion à la base et la clé des sessions. Pour une nouvelle machine, copier `.env.example` vers `.env` uniquement si ce dernier n'existe pas déjà, puis remplir :
 
 1. `MONGODB_URI` : copier la chaîne de connexion Azure, avec le nom de base `capsavoir`. Conserver ses paramètres, notamment `ssl=true`, `replicaSet=globaldb` et `retrywrites=false`, ainsi que `maxIdleTimeMS` et `appName` s'ils sont fournis.
-2. `FORMATEUR_ID` : dans Compass, ouvrir `capsavoir` puis `Utilisateur`, rechercher `{ "email": "formateur.test@capsavoir.test" }` et copier la valeur hexadécimale de `_id`, sans `ObjectId(...)`. Ce profil « Formateur Demonstration » possède le rôle `FORMATEUR` dans la base Cosmos DB.
+2. `JWT_SECRET` : clé de signature des sessions, voir [authentification US01 US02 US03](auth-us01-us02-us03.md).
 3. `PORT` : conserver `3000` pour le frontend local existant.
 4. `UPLOAD_DIR` : facultatif en local ; vide, il conserve les fichiers dans le dossier `uploads` du backend. Sur un serveur, choisir un dossier persistant.
 
 La vraie URI contient des identifiants d'accès à la base : elle reste uniquement dans `.env` ou dans les variables d'environnement du serveur. `.env.example` contient des instructions et un exemple fictif, sans clé ni mot de passe réel. Modifier la base dans `.env` nécessite de redémarrer le backend pour recharger la configuration.
 
-Le profil de démonstration a un mot de passe haché à partir d'une valeur aléatoire non conservée ; il n'a pas de connexion utilisateur utilisable.
+Les routes du module sont réservées aux utilisateurs connectés ayant le rôle `FORMATEUR` (US02/US03) : `401` sans session, `403` pour un autre rôle. Chaque formateur ne voit et ne modifie que ses propres formations et fichiers. Pour obtenir le rôle avant US38, voir « Créer le premier agent » dans le [guide d'authentification](auth-us01-us02-us03.md).
 
-Aucun JWT ni écran de connexion n'est ajouté. En attendant US02/US03, toutes les routes du module utilisent le même profil défini côté serveur par `FORMATEUR_ID`. Ce contexte ne constitue pas une authentification : l'espace n'est pas destiné à être exposé publiquement avant intégration des droits utilisateurs.
+Le profil « Formateur Demonstration » (`formateur.test@capsavoir.test`) a un mot de passe haché à partir d'une valeur aléatoire non conservée : il ne permet pas de se connecter, et ses formations ne sont visibles par aucun autre formateur.
 
 L'espace formateur enregistre les formations, chapitres et références de ressources dans Cosmos DB via Mongoose. Les fichiers téléversés restent dans le dossier `uploads` décrit plus bas. Une formation « Node.js et Angular - Formation de demonstration » a été créée depuis Angular et sa présence dans `capsavoir.Formation` a été vérifiée, avec le statut `BROUILLON`.
 
 ### Option MongoDB sur le PC
 
-Pour travailler sur une base distincte installée sur le PC, utiliser `mongodb://127.0.0.1:27017/capsavoir` dans `.env` et un `FORMATEUR_ID` existant dans cette base locale. Le script `npm.cmd run db:init` crée les collections absentes et leurs index sans supprimer les documents existants. Il n'est pas nécessaire de l'exécuter pour la base Cosmos DB déjà initialisée de l'équipe.
+Pour travailler sur une base distincte installée sur le PC, utiliser `mongodb://127.0.0.1:27017/capsavoir` dans `.env`, puis créer un compte formateur dans cette base locale avec `npm run utilisateur:creer`. Le script `npm.cmd run db:init` crée les collections absentes et leurs index sans supprimer les documents existants. Il n'est pas nécessaire de l'exécuter pour la base Cosmos DB déjà initialisée de l'équipe.
 
 ## Lancement
 
@@ -112,7 +112,7 @@ Ouvrir `http://127.0.0.1:4200/formateur`. `/health` vérifie l'API ; `http://loc
 
 ## API
 
-Toutes les routes vérifient le profil configuré. Les routes de formation limitent l'accès aux documents appartenant à ce profil. Le titre, les catégories, le prix, les identifiants et les références de fichiers sont validés côté serveur. Le statut et le propriétaire d'une nouvelle formation sont toujours définis par le serveur.
+Toutes les routes exigent un formateur connecté (en-tête `Authorization: Bearer <jeton>`). Les routes de formation limitent l'accès aux documents appartenant à ce formateur. Le titre, les catégories, le prix, les identifiants et les références de fichiers sont validés côté serveur. Le statut et le propriétaire d'une nouvelle formation sont toujours définis par le serveur.
 
 | Méthode | Chemin sous `/api` | Fonction |
 | --- | --- | --- |

@@ -31,6 +31,7 @@ app.get('/health/db', async (req, res) => {
   }
 });
 
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/formations', require('./routes/formations'));
 app.use('/api/fichiers', require('./routes/fichiers'));
 app.use('/api/paiements', require('./routes/paiements')); // US18

@@ -1,0 +1,135 @@
+/* Styles des pages compte (connexion, inscription) et des espaces par rôle.
+   Limités à ces composants, comme formateur.css pour l'espace formateur. */
+app-connexion,
+app-inscription,
+app-espace-apprenant,
+app-espace-agent {
+  display: block;
+  padding: 48px 20px;
+
+  .auth-carte,
+  .espace {
+    margin: 0 auto;
+    background: var(--couleur-surface);
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 14px;
+    padding: 32px;
+  }
+  .auth-carte {
+    max-width: 460px;
+  }
+  .espace {
+    max-width: 960px;
+  }
+  .eyebrow {
+    color: var(--couleur-principale);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+  }
+  h2 {
+    margin: 8px 0 6px;
+    font-size: 24px;
+    letter-spacing: -0.5px;
+  }
+  .muted {
+    color: var(--couleur-secondaire);
+    margin: 0 0 8px;
+    font-size: 14px;
+  }
+  fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 650;
+    margin: 18px 0 8px;
+  }
+  input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--couleur-bordure);
+    border-radius: 7px;
+    background: var(--couleur-fond-champ);
+    color: var(--couleur-texte);
+    font: inherit;
+    font-size: 14px;
+  }
+  input:focus {
+    outline: 2px solid var(--couleur-principale);
+    outline-offset: 1px;
+  }
+  small {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--couleur-secondaire);
+  }
+  small.champ-erreur {
+    color: var(--couleur-erreur);
+  }
+  .two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+  }
+  .bouton {
+    width: 100%;
+    margin-top: 26px;
+    padding: 13px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--couleur-principale);
+    color: var(--couleur-surface);
+    font-weight: 650;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .bouton:hover:not(:disabled) {
+    background: var(--couleur-survol);
+  }
+  fieldset:disabled .bouton {
+    opacity: 0.7;
+    cursor: wait;
+  }
+  .notice {
+    margin: 16px 0 0;
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    background: var(--couleur-lavande);
+  }
+  .notice.error {
+    background: color-mix(in srgb, var(--couleur-erreur) 12%, transparent);
+    color: var(--couleur-erreur);
+  }
+  .notice.success {
+    background: color-mix(in srgb, var(--couleur-succes) 12%, transparent);
+    color: var(--couleur-succes);
+  }
+  .bas-carte {
+    margin: 22px 0 0;
+    text-align: center;
+    font-size: 13px;
+    color: var(--couleur-secondaire);
+  }
+  .bas-carte a {
+    color: var(--couleur-principale);
+    font-weight: 650;
+    text-decoration: none;
+  }
+  @media (max-width: 600px) {
+    padding: 24px 16px;
+    .auth-carte,
+    .espace {
+      padding: 24px 20px;
+    }
+    .two-cols {
+      grid-template-columns: 1fr;
+    }
+  }
+}

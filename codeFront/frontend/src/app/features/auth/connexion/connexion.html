@@ -1,0 +1,54 @@
+<section class="auth-carte">
+  <span class="eyebrow">CONNEXION</span>
+  <h2>Bon retour parmi nous</h2>
+  <p class="muted">Connectez-vous pour accéder à votre espace.</p>
+
+  @if (nouveauCompte) {
+    <p class="notice success">Compte créé. Vous pouvez vous connecter.</p>
+  }
+  @if (expiree) {
+    <p class="notice">Votre session a expiré. Reconnectez-vous.</p>
+  }
+  @if (erreur()) {
+    <p class="notice error" role="alert">{{ erreur() }}</p>
+  }
+
+  <form #form="ngForm" (ngSubmit)="form.valid && connecter()" novalidate>
+    <fieldset [disabled]="charge()">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        autocomplete="username"
+        [(ngModel)]="email"
+        required
+        email
+        #champEmail="ngModel"
+      />
+      @if (champEmail.invalid && (champEmail.touched || form.submitted)) {
+        <small class="champ-erreur">Saisissez un email valide.</small>
+      }
+
+      <label for="motDePasse">Mot de passe</label>
+      <input
+        id="motDePasse"
+        name="motDePasse"
+        type="password"
+        autocomplete="current-password"
+        [(ngModel)]="motDePasse"
+        required
+        #champMdp="ngModel"
+      />
+      @if (champMdp.invalid && (champMdp.touched || form.submitted)) {
+        <small class="champ-erreur">Saisissez votre mot de passe.</small>
+      }
+
+      <button class="bouton" type="submit">
+        {{ charge() ? 'Connexion…' : 'Se connecter' }}
+      </button>
+    </fieldset>
+  </form>
+
+  <p class="bas-carte">Pas encore de compte ? <a routerLink="/inscription">Créer un compte</a></p>
+</section>

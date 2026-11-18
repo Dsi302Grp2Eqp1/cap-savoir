@@ -2,8 +2,13 @@ const express = require('express');
 const { Types } = require('mongoose');
 const { Formation, Inscription } = require('../models');
 const passerelle = require('../services/passerelle');
+const { authentifier, exigerRole } = require('../middlewares/authentification');
 
 const router = express.Router();
+
+// US02 / US03 : seul un apprenant connecté peut payer et consulter ses paiements.
+// Le webhook Stripe n'est pas ici : il est monté dans app.js, sans authentification.
+router.use(authentifier, exigerRole('APPRENANT'));
 
 
 
@@ -33,7 +38,7 @@ async function traiterNotification(reference) {
 
 
 // POST /api/paiements/checkout  { formationId }
-// Nécessite l'authentification (US02) : elle doit renseigner req.utilisateur._id.
+// Authentification (US02) assurée par router.use ci-dessus : req.utilisateur._id.
 router.post('/checkout', async (req, res) => {
   const apprenantId = req.utilisateur?._id;
   if (!apprenantId) return res.sendStatus(401);
