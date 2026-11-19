@@ -11,6 +11,9 @@
   } @else if (statut()?.paiement === 'CONFIRME') {
     <h2>Paiement confirmé</h2>
     <p class="muted">Votre inscription est active.</p>
+    @if (formationId) {
+      <a class="lien" [routerLink]="['/apprenant/formation', formationId]">Accéder à la formation</a>
+    }
     <a class="lien" routerLink="/apprenant">Retour à mon espace</a>
   } @else if (statut()?.paiement === 'ECHOUE') {
     <h2>Paiement échoué</h2>

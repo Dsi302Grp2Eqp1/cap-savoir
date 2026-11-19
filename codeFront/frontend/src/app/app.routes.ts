@@ -7,6 +7,13 @@ import { AuthService } from './core/auth/auth.service';
 const versEspace = () => inject(AuthService).espaceParDefaut();
 
 export const routes: Routes = [
+  // US19 : contenu d'une formation payée (accès vérifié par le serveur).
+  {
+    path: 'apprenant/formation/:formationId',
+    canActivate: [roleGuard('APPRENANT')],
+    loadComponent: () =>
+      import('./features/apprenant/formation/acces/acces').then((m) => m.Acces),
+  },
   { path: '', pathMatch: 'full', redirectTo: versEspace },
   {
     path: 'connexion',
