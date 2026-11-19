@@ -13,7 +13,7 @@ app.use(cors({
 // Webhook Stripe (US18). DOIT rester AVANT express.json() : Stripe signe le corps
 // brut de la requête, et express.json() le transforme et casse la vérification.
 app.post('/api/paiements/webhook', express.raw({ type: 'application/json' }),
-  require('./routes/paiements').webhook);
+  require('./controllers/paiements').webhook);
 app.use(express.json());
 
 // Used by the pipeline smoke test. Must stay public and return 200.
