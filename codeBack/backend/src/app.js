@@ -35,6 +35,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/formations', require('./routes/formations'));
 app.use('/api/fichiers', require('./routes/fichiers'));
 app.use('/api/paiements', require('./routes/paiements')); // US18
+app.use('/api/contenu', require('./routes/contenu')); // US19
 app.use((req, res) => res.status(404).json({ erreur: 'Route introuvable.' }));
 app.use(require('./middlewares/erreurs'));
 
