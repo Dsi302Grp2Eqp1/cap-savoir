@@ -33,11 +33,27 @@ export const routes: Routes = [
         (m) => m.EspaceFormateur,
       ),
   },
+
+  // US39, US40, US12 (P3) : espace agent
   {
-    path: 'agent',
+    path: 'agent/formations',
     canActivate: [roleGuard('AGENT')],
     loadComponent: () =>
-      import('./features/espaces/espace-agent/espace-agent').then((m) => m.EspaceAgent),
+      import('./features/agent/formations-soumises/formations-soumises').then(
+        (m) => m.FormationsSoumises,
+      ),
   },
+  {
+    path: 'agent/formations/:id',
+    canActivate: [roleGuard('AGENT')],
+    loadComponent: () =>
+      import('./features/agent/formation-detail/formation-detail').then((m) => m.FormationDetail),
+  },
+  {
+    path: 'agent',
+    pathMatch: 'full',
+    redirectTo: 'agent/formations',
+  },
+
   { path: '**', redirectTo: versEspace },
 ];

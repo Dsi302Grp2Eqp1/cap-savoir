@@ -1,22 +1,21 @@
-// Express app definition (no DB connection, no listen) so tests can import it.
 const express = require('express');
 const cors = require('cors');
 const { etatBase } = require('./db');
 
 const app = express();
 
-// Origin is the domain only, without the /cap-savoir path.
 app.use(cors({
-  origin: ['https://dsi302grp2eqp1.github.io', 'http://localhost:4200', 'http://127.0.0.1:4200'],
+  origin: [
+    'https://dsi302grp2eqp1.github.io',
+    /^http:\/\/localhost:\d+$/,
+    /^http:\/\/127\.0\.0\.1:\d+$/
+  ],
   credentials: true
 }));
 app.use(express.json());
 
-// Used by the pipeline smoke test. Must stay public and return 200.
 app.get('/health', (req, res) => res.sendStatus(200));
 
-// Database check: 200 only if the API is connected and the 7 collections exist.
-// Returns 503 otherwise (no connection, wrong MONGODB_URI, db:init not run).
 app.get('/health/db', async (req, res) => {
   try {
     const etat = await etatBase();
@@ -30,6 +29,8 @@ app.get('/health/db', async (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/formations', require('./routes/formations'));
 app.use('/api/fichiers', require('./routes/fichiers'));
+app.use('/api/agent', require('./routes/validation'));
+
 app.use((req, res) => res.status(404).json({ erreur: 'Route introuvable.' }));
 app.use(require('./middlewares/erreurs'));
 
