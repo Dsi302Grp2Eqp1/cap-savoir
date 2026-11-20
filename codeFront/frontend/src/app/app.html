@@ -14,17 +14,6 @@
   }
 
   <div class="header-right">
-    <span class="status" aria-label="État de l’API">
-      <span class="dot" [class]="apiStatus()"></span>
-      {{
-        apiStatus() === 'online'
-          ? 'API connectée'
-          : apiStatus() === 'offline'
-            ? 'API indisponible'
-            : 'Connexion…'
-      }}
-    </span>
-
     @if (auth.utilisateur(); as utilisateur) {
       <span class="utilisateur">
         {{ utilisateur.prenom }} {{ utilisateur.nom }}
