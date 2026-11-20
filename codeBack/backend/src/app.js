@@ -12,10 +12,17 @@ app.use(cors({
   ],
   credentials: true
 }));
+// Webhook Stripe (US18). DOIT rester AVANT express.json() : Stripe signe le corps
+// brut de la requête, et express.json() le transforme et casse la vérification.
+app.post('/api/paiements/webhook', express.raw({ type: 'application/json' }),
+  require('./controllers/paiements').webhook);
 app.use(express.json());
 
+// Used by the pipeline smoke test. Must stay public and return 200.
 app.get('/health', (req, res) => res.sendStatus(200));
 
+// Database check: 200 only if the API is connected and the 7 collections exist.
+// Returns 503 otherwise (no connection, wrong MONGODB_URI, db:init not run).
 app.get('/health/db', async (req, res) => {
   try {
     const etat = await etatBase();
@@ -29,7 +36,9 @@ app.get('/health/db', async (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/formations', require('./routes/formations'));
 app.use('/api/fichiers', require('./routes/fichiers'));
-app.use('/api/agent', require('./routes/validation'));
+app.use('/api/paiements', require('./routes/paiements')); // US18
+app.use('/api/contenu', require('./routes/contenu'));     // US19
+app.use('/api/agent', require('./routes/validation'));    // US39, US40, US12
 
 app.use((req, res) => res.status(404).json({ erreur: 'Route introuvable.' }));
 app.use(require('./middlewares/erreurs'));

@@ -1,0 +1,34 @@
+<!-- US19 : contenu d'une formation payée. -->
+<section class="carte">
+  <span class="eyebrow">MA FORMATION</span>
+
+  @if (charge()) {
+    <h2>Chargement…</h2>
+  } @else if (erreur()) {
+    <h2>Accès impossible</h2>
+    <p class="erreur" role="alert">{{ erreur() }}</p>
+    <a class="lien" routerLink="/apprenant">Retour à mon espace</a>
+  } @else if (contenu(); as c) {
+    <h2>{{ c.titre }}</h2>
+    @if (c.chapitres.length === 0) {
+      <p class="muted">Cette formation ne contient pas encore de chapitres.</p>
+    } @else {
+      @for (chapitre of c.chapitres; track chapitre._id) {
+        <div class="chapitre">
+          <h3>{{ chapitre.ordre }}. {{ chapitre.titre }}</h3>
+          @if (chapitre.description) {
+            <p class="muted">{{ chapitre.description }}</p>
+          }
+          @if (chapitre.ressources.length > 0) {
+            <ul>
+              @for (ressource of chapitre.ressources; track ressource._id) {
+                <li>{{ ressource.titre }} ({{ ressource.type }})</li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    }
+    <a class="lien" routerLink="/apprenant">Retour à mon espace</a>
+  }
+</section>

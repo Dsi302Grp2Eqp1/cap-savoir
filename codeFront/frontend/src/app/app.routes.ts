@@ -7,6 +7,13 @@ import { AuthService } from './core/auth/auth.service';
 const versEspace = () => inject(AuthService).espaceParDefaut();
 
 export const routes: Routes = [
+  // US19 : contenu d'une formation payée (accès vérifié par le serveur).
+  {
+    path: 'apprenant/formation/:formationId',
+    canActivate: [roleGuard('APPRENANT')],
+    loadComponent: () =>
+      import('./features/apprenant/formation/acces/acces').then((m) => m.Acces),
+  },
   { path: '', pathMatch: 'full', redirectTo: versEspace },
   {
     path: 'connexion',
@@ -18,6 +25,19 @@ export const routes: Routes = [
     canActivate: [visiteurGuard],
     loadComponent: () =>
       import('./features/auth/inscription/inscription').then((m) => m.Inscription),
+  },
+  // US18 : paiement d'une formation par l'apprenant.
+  {
+    path: 'apprenant/paiement/:formationId',
+    canActivate: [roleGuard('APPRENANT')],
+    loadComponent: () => import('./features/apprenant/paiement/payer/payer').then((m) => m.Payer),
+  },
+  {
+    // US18 : résultat du paiement. URL de retour de la passerelle (voir services/passerelle.js du backend).
+    path: 'paiement/resultat',
+    canActivate: [roleGuard('APPRENANT')],
+    loadComponent: () =>
+      import('./features/apprenant/paiement/resultat/resultat').then((m) => m.Resultat),
   },
   {
     path: 'apprenant',
