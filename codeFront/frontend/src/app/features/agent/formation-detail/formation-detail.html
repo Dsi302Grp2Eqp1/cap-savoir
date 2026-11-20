@@ -1,0 +1,73 @@
+<main class="page">
+  <a class="retour" routerLink="/agent/formations">← Retour à la liste</a>
+
+  @if (chargement()) { <p class="info">Chargement…</p> }
+  @if (erreur()) { <div class="alerte alerte-erreur">{{ erreur() }}</div> }
+  @if (succes()) { <div class="alerte alerte-succes">{{ succes() }}</div> }
+
+  @if (formation(); as f) {
+    <section class="entete">
+      <img class="photo" [src]="urlImage(f)" [alt]="f.titre" (error)="imageErreur($event)" />
+      <div>
+        <span [class]="'badge badge-' + f.statut.toLowerCase()">{{ f.statut }}</span>
+        <h1>{{ f.titre }}</h1>
+        <p class="desc">{{ f.description }}</p>
+        <p class="meta">{{ f.categories.join(', ') }} · {{ f.prix | number: '1.2-2' }} TND</p>
+        <p class="meta">Formateur : {{ f.formateur.prenom }} {{ f.formateur.nom }}</p>
+        <p class="meta">Créée le {{ f.dateCreation | date: 'dd/MM/yyyy' }}</p>
+      </div>
+    </section>
+
+    @if (demande(); as d) {
+      <section class="bloc">
+        <h2>Demande de validation</h2>
+        <p class="meta">Statut : <strong>{{ d.statut }}</strong></p>
+        @if (d.dateDecision) {
+          <p class="meta">Décision le {{ d.dateDecision | date: 'dd/MM/yyyy HH:mm' }}</p>
+        }
+        @if (d.commentaire) {
+          <p class="meta">Motif : {{ d.commentaire }}</p>
+        }
+      </section>
+    }
+
+    <section class="bloc">
+      <h2>Parcours pédagogique <span class="compte">{{ f.chapitres?.length ?? 0 }} chapitre(s)</span></h2>
+      @for (c of f.chapitres ?? []; track c._id) {
+        <article class="chapitre">
+          <div class="num">{{ c.ordre }}</div>
+          <div class="chap-corps">
+            <h3>{{ c.titre }}</h3>
+            @if (c.description) { <p class="meta">{{ c.description }}</p> }
+            <ul class="ressources">
+              @for (r of c.ressources; track r._id) {
+                <li><span class="type">{{ r.type }}</span> {{ r.titre }}</li>
+              }
+            </ul>
+          </div>
+        </article>
+      } @empty {
+        <p class="info">Aucun chapitre.</p>
+      }
+    </section>
+
+    @if (peutTraiter) {
+      <section class="bloc decision">
+        <h2>Décision</h2>
+        @if (!refus) {
+          <div class="actions">
+            <button class="btn btn-primaire" [disabled]="envoi()" (click)="accepter()">Accepter et publier</button>
+            <button class="btn btn-danger" [disabled]="envoi()" (click)="refus = true">Refuser</button>
+          </div>
+        } @else {
+          <label for="motif">Motif du refus <span class="oblig">(obligatoire)</span></label>
+          <textarea id="motif" rows="4" [(ngModel)]="commentaire" placeholder="Expliquez au formateur ce qu'il doit corriger…"></textarea>
+          <div class="actions">
+            <button class="btn btn-danger" [disabled]="envoi()" (click)="confirmerRefus()">Confirmer le refus</button>
+            <button class="btn btn-clair" [disabled]="envoi()" (click)="refus = false">Annuler</button>
+          </div>
+        }
+      </section>
+    }
+  }
+</main>

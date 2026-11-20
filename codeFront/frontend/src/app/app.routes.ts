@@ -7,6 +7,13 @@ import { AuthService } from './core/auth/auth.service';
 const versEspace = () => inject(AuthService).espaceParDefaut();
 
 export const routes: Routes = [
+  // US19 : contenu d'une formation payée (accès vérifié par le serveur).
+  {
+    path: 'apprenant/formation/:formationId',
+    canActivate: [roleGuard('APPRENANT')],
+    loadComponent: () =>
+      import('./features/apprenant/formation/acces/acces').then((m) => m.Acces),
+  },
   { path: '', pathMatch: 'full', redirectTo: versEspace },
   {
     path: 'connexion',
@@ -19,7 +26,21 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/auth/inscription/inscription').then((m) => m.Inscription),
   },
-  // ─── Espace apprenant (P4 : US23, US24) ───────────────────────────────────
+
+  // ─── Espace apprenant ─────────────────────────────────────────────────────
+  // US18 : paiement d'une formation par l'apprenant.
+  {
+    path: 'apprenant/paiement/:formationId',
+    canActivate: [roleGuard('APPRENANT')],
+    loadComponent: () => import('./features/apprenant/paiement/payer/payer').then((m) => m.Payer),
+  },
+  {
+    // US18 : résultat du paiement. URL de retour de la passerelle (voir services/passerelle.js du backend).
+    path: 'paiement/resultat',
+    canActivate: [roleGuard('APPRENANT')],
+    loadComponent: () =>
+      import('./features/apprenant/paiement/resultat/resultat').then((m) => m.Resultat),
+  },
   {
     path: 'apprenant',
     canActivate: [roleGuard('APPRENANT')],
@@ -40,7 +61,8 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/apprenant/quiz/quiz-resultat/quiz-resultat').then((m) => m.QuizResultat),
   },
-  // ─── Espace formateur (P4 : US22) ─────────────────────────────────────────
+
+  // ─── Espace formateur ─────────────────────────────────────────────────────
   {
     path: 'formateur',
     canActivate: [roleGuard('FORMATEUR')],
@@ -56,11 +78,27 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/apprenant/quiz/quiz-editeur/quiz-editeur').then((m) => m.QuizEditeur),
   },
+
+  // ─── Espace agent (US39, US40, US12) ──────────────────────────────────────
   {
-    path: 'agent',
+    path: 'agent/formations',
     canActivate: [roleGuard('AGENT')],
     loadComponent: () =>
-      import('./features/espaces/espace-agent/espace-agent').then((m) => m.EspaceAgent),
+      import('./features/agent/formations-soumises/formations-soumises').then(
+        (m) => m.FormationsSoumises,
+      ),
   },
+  {
+    path: 'agent/formations/:id',
+    canActivate: [roleGuard('AGENT')],
+    loadComponent: () =>
+      import('./features/agent/formation-detail/formation-detail').then((m) => m.FormationDetail),
+  },
+  {
+    path: 'agent',
+    pathMatch: 'full',
+    redirectTo: 'agent/formations',
+  },
+
   { path: '**', redirectTo: versEspace },
 ];

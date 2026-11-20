@@ -1,0 +1,52 @@
+/* US18 : page de résultat du paiement. */
+:host {
+  display: block;
+  padding: 48px 20px;
+}
+.carte {
+  max-width: 460px;
+  margin: 0 auto;
+  background: var(--couleur-surface);
+  border: 1px solid var(--couleur-bordure);
+  border-radius: 14px;
+  padding: 32px;
+}
+.eyebrow {
+  color: var(--couleur-principale);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+h2 {
+  margin: 8px 0 6px;
+  font-size: 24px;
+  letter-spacing: -0.5px;
+}
+.muted {
+  color: var(--couleur-secondaire);
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+.erreur {
+  color: var(--couleur-erreur);
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+.lien {
+  color: var(--couleur-principale);
+  font-weight: 650;
+}
+.bouton {
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--couleur-principale);
+  color: #fff;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+.bouton:hover {
+  background: var(--couleur-survol);
+}
