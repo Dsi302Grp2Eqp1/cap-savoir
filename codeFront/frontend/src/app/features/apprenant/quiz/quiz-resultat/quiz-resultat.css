@@ -1,0 +1,51 @@
+/* Quiz Résultat — US24 */
+.resultat-wrapper { max-width: 680px; margin: 0 auto; padding: 24px 16px; }
+
+.score-card {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 28px;
+  border-radius: 14px;
+  margin-bottom: 24px;
+  border: 2px solid;
+}
+.score-card.valide { background: #f0fdf4; border-color: var(--couleur-succes); }
+.score-card.echoue { background: #fef2f2; border-color: var(--couleur-erreur); }
+
+.score-cercle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--couleur-surface);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  flex-shrink: 0;
+}
+.score-valeur { font-size: 22px; font-weight: 800; color: var(--couleur-texte); }
+.score-label { font-size: 11px; color: var(--couleur-secondaire); }
+
+.score-info h2 { margin: 0 0 6px; font-size: 20px; }
+.conseil { color: var(--couleur-erreur); font-size: 14px; margin-top: 8px; }
+.succes-msg { color: var(--couleur-succes); font-size: 14px; margin-top: 8px; font-weight: 600; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 28px; }
+.actions button {
+  padding: 10px 20px; border-radius: 7px; font-weight: 600;
+  font-size: 14px; cursor: pointer; border: none;
+  background: var(--couleur-principale); color: #fff;
+}
+.btn-ghost {
+  background: transparent !important;
+  color: var(--couleur-secondaire) !important;
+  border: 1px solid var(--couleur-bordure) !important;
+}
+
+.center { text-align: center; padding: 48px; }
+.loading { color: var(--couleur-secondaire); font-style: italic; }
+.muted { color: var(--couleur-secondaire); font-size: 14px; }
+.notice { padding: 12px 16px; border-radius: 7px; margin-bottom: 16px; font-size: 14px; }
+.notice.error { background: #fef2f2; color: var(--couleur-erreur); border: 1px solid #fecaca; }

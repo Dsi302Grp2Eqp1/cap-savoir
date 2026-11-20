@@ -1,0 +1,148 @@
+<section class="panel">
+  <span class="eyebrow">QUIZ — CHAPITRE</span>
+  <h3>{{ modeEdition() ? 'Modifier le quiz' : 'Créer un quiz' }}</h3>
+  <p class="muted">Définissez les questions, les propositions et le score minimum de réussite.</p>
+
+  @if (erreur()) {
+    <div class="notice error" role="alert">{{ erreur() }}</div>
+  }
+  @if (message()) {
+    <div class="notice success" role="status">{{ message() }}</div>
+  }
+  @if (charge()) {
+    <p class="loading" role="status">Enregistrement en cours…</p>
+  }
+
+  <form (ngSubmit)="enregistrer()" #quizForm="ngForm">
+    <fieldset [disabled]="charge()">
+
+      <!-- Titre + Score minimum -->
+      <div class="two-cols">
+        <div>
+          <label for="quizTitre">Titre du quiz</label>
+          <input
+            id="quizTitre"
+            name="quizTitre"
+            [(ngModel)]="formulaire.titre"
+            required
+            maxlength="200"
+            placeholder="Ex. Évaluation finale — Chapitre 1"
+          />
+        </div>
+        <div>
+          <label for="scoreMin">Score minimum de réussite (%)</label>
+          <input
+            id="scoreMin"
+            name="scoreMin"
+            type="number"
+            [(ngModel)]="formulaire.scoreMinimum"
+            required
+            min="0"
+            max="100"
+            step="1"
+          />
+          <small>L'apprenant doit atteindre ce % pour valider le quiz.</small>
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <div class="questions-section">
+        <div class="section-heading">
+          <h4>Questions</h4>
+          <span class="count">{{ formulaire.questions.length }} question(s)</span>
+        </div>
+
+        @for (question of formulaire.questions; track $index; let qi = $index) {
+          <div class="question-card panel">
+            <div class="question-header">
+              <span class="eyebrow">Question {{ qi + 1 }}</span>
+              @if (formulaire.questions.length > 1) {
+                <button type="button" class="btn-danger-sm" (click)="supprimerQuestion(qi)">
+                  Supprimer
+                </button>
+              }
+            </div>
+
+            <label [for]="'enonce-' + qi">Énoncé</label>
+            <textarea
+              [id]="'enonce-' + qi"
+              [name]="'enonce-' + qi"
+              [(ngModel)]="question.enonce"
+              required
+              rows="2"
+              placeholder="Ex. Qu'est-ce qu'une promesse en JavaScript ?"
+            ></textarea>
+
+            <div class="two-cols">
+              <div>
+                <label [for]="'points-' + qi">Points</label>
+                <input
+                  [id]="'points-' + qi"
+                  [name]="'points-' + qi"
+                  type="number"
+                  [(ngModel)]="question.points"
+                  required
+                  min="0"
+                  step="0.5"
+                />
+              </div>
+              <div>
+                <label [for]="'explication-' + qi">Explication (facultatif)</label>
+                <input
+                  [id]="'explication-' + qi"
+                  [name]="'explication-' + qi"
+                  [(ngModel)]="question.explication"
+                  maxlength="1000"
+                  placeholder="Explication affichée lors de la correction"
+                />
+              </div>
+            </div>
+
+            <!-- Propositions -->
+            <div class="propositions-label">
+              <span>Propositions <small>(cochez la bonne réponse)</small></span>
+            </div>
+            @for (prop of question.propositions; track $index; let pi = $index) {
+              <div class="proposition-row">
+                <input
+                  type="radio"
+                  [name]="'bonne-' + qi"
+                  [checked]="prop.estCorrecte"
+                  (change)="definirBonneReponse(question, pi)"
+                  [id]="'radio-' + qi + '-' + pi"
+                />
+                <label [for]="'radio-' + qi + '-' + pi" class="radio-label">✓</label>
+                <input
+                  type="text"
+                  [name]="'prop-' + qi + '-' + pi"
+                  [(ngModel)]="prop.texte"
+                  required
+                  maxlength="500"
+                  placeholder="Proposition {{ pi + 1 }}"
+                  class="prop-input"
+                />
+                @if (question.propositions.length > 2) {
+                  <button type="button" class="btn-icon" (click)="supprimerProposition(question, pi)" title="Supprimer">✕</button>
+                }
+              </div>
+            }
+            <button type="button" class="btn-secondary-sm" (click)="ajouterProposition(question)">
+              + Ajouter une proposition
+            </button>
+          </div>
+        }
+
+        <button type="button" class="btn-secondary" (click)="ajouterQuestion()">
+          + Ajouter une question
+        </button>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-ghost" (click)="retour()">Annuler</button>
+        <button type="submit" [disabled]="quizForm.invalid">
+          {{ modeEdition() ? 'Enregistrer les modifications' : 'Créer le quiz' }}
+        </button>
+      </div>
+    </fieldset>
+  </form>
+</section>

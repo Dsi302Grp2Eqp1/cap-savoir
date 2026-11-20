@@ -30,6 +30,8 @@ app.get('/health/db', async (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/formations', require('./routes/formations'));
 app.use('/api/fichiers', require('./routes/fichiers'));
+// P4 : Quiz (US22, US23, US24, US25, US26, US28)
+app.use('/api', require('./routes/quiz'));
 app.use((req, res) => res.status(404).json({ erreur: 'Route introuvable.' }));
 app.use(require('./middlewares/erreurs'));
 
