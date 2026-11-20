@@ -40,23 +40,6 @@ h1 {
   font-size: 12px;
   color: var(--couleur-secondaire);
 }
-.status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--couleur-secondaire);
-}
-.dot.online {
-  background: var(--couleur-succes);
-}
-.dot.offline {
-  background: var(--couleur-erreur);
-}
 /* US03 : menu des espaces et zone utilisateur. */
 nav {
   display: flex;
@@ -108,7 +91,6 @@ nav a.actif,
     padding: 16px 20px;
     gap: 12px;
   }
-  .status,
   .utilisateur small {
     display: none;
   }
