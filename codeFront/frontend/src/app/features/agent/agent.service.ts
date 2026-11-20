@@ -1,9 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ApiService } from '../../core/api.service';
 
-export const SERVER = 'http://localhost:3000';
-const API = SERVER + '/api/agent';
+// Chemin relatif : ApiService ajoute environment.apiUrl (local ou Azure)
+// et l'intercepteur ajoute le jeton de session.
+const API = '/api/agent';
 
 export interface Formation {
   _id: string;
@@ -44,7 +46,7 @@ export const IMAGE_PAR_DEFAUT =
 
 @Injectable({ providedIn: 'root' })
 export class AgentService {
-  private http = inject(HttpClient);
+  private readonly api = inject(ApiService);
 
   lister(filtres: { q: string; formateur: string; statut: string }): Observable<ListeReponse> {
     let params = new HttpParams();
@@ -52,11 +54,12 @@ export class AgentService {
     if (filtres.formateur) params = params.set('formateur', filtres.formateur);
     // statut vide = « Tous » : on n'envoie pas le paramètre
     if (filtres.statut) params = params.set('statut', filtres.statut);
-    return this.http.get<ListeReponse>(API + '/formations', { params });
+    const requete = params.toString();
+    return this.api.get<ListeReponse>(`${API}/formations${requete ? '?' + requete : ''}`);
   }
 
   detail(id: string): Observable<DetailReponse> {
-    return this.http.get<DetailReponse>(API + '/formations/' + id);
+    return this.api.get<DetailReponse>(`${API}/formations/${encodeURIComponent(id)}`);
   }
 
   traiter(
@@ -64,7 +67,7 @@ export class AgentService {
     decision: 'accepter' | 'refuser',
     commentaire?: string,
   ): Observable<DetailReponse> {
-    return this.http.patch<DetailReponse>(API + '/formations/' + id + '/traiter', {
+    return this.api.patch<DetailReponse>(`${API}/formations/${encodeURIComponent(id)}/traiter`, {
       decision,
       commentaire,
     });

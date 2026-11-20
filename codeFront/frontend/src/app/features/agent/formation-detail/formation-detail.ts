@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { AgentService, Demande, Formation, IMAGE_PAR_DEFAUT, SERVER } from '../agent.service';
+import { AgentService, Demande, Formation, IMAGE_PAR_DEFAUT } from '../agent.service';
 
 @Component({
   selector: 'app-formation-detail',
@@ -14,7 +14,6 @@ import { AgentService, Demande, Formation, IMAGE_PAR_DEFAUT, SERVER } from '../a
 export class FormationDetail implements OnInit {
   private service = inject(AgentService);
   private route = inject(ActivatedRoute);
-  readonly serveur = SERVER;
   readonly placeholder = IMAGE_PAR_DEFAUT;
 
   id = '';
@@ -52,8 +51,10 @@ export class FormationDetail implements OnInit {
     return this.formation()?.statut === 'SOUMISE';
   }
 
-  urlImage(f: Formation): string {
-    return f.image?.url ? this.serveur + f.image.url : this.placeholder;
+  // Les fichiers (/api/fichiers) sont réservés au formateur propriétaire : une balise <img>
+  // ne peut pas les afficher pour un agent. Image neutre en attendant une route dédiée.
+  urlImage(_f: Formation): string {
+    return this.placeholder;
   }
 
   imageErreur(e: Event) {

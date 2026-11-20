@@ -83,14 +83,13 @@ async function detail(formationId) {
   if (!formation) {
     throw new ErreurApi(404, 'Formation introuvable.');
   }
-  let demande = await trouverDemandeEnAttente(formationId);
-  if (!demande) {
-    // Pas de demande en attente : on affiche la dernière demande traitée.
-    demande = await Demande.findOne({ type: 'VALIDATION', formationId: formationId })
-      .sort({ dateSoumission: -1 });
-  }
+  // Lecture seule : la dernière demande de validation (en attente ou traitée).
+  // La demande manquante d'une formation SOUMISE est créée au traitement (traiter).
+  const demande = await Demande.findOne({ type: 'VALIDATION', formationId: formationId })
+    .sort({ dateSoumission: -1 })
+    .lean();
 
-  return { formation: formation, demande: demande ? demande.toObject() : null };
+  return { formation: formation, demande: demande || null };
 }
 
 // US12 : accepter ou refuser une formation soumise.
@@ -99,6 +98,12 @@ async function traiter(formationId, agent, donnees) {
 
   const decision = donnees && donnees.decision;
   const commentaire = donnees && donnees.commentaire;
+  if (decision !== 'accepter' && decision !== 'refuser') {
+    throw new ErreurApi(400, 'Décision invalide : "accepter" ou "refuser".');
+  }
+  if (commentaire != null && (typeof commentaire !== 'string' || commentaire.length > 2000)) {
+    throw new ErreurApi(400, 'Commentaire invalide (maximum 2000 caractères).');
+  }
   if (decision === 'refuser' && (!commentaire || !commentaire.trim())) {
     throw new ErreurApi(400, 'Un motif est obligatoire pour refuser.');
   }

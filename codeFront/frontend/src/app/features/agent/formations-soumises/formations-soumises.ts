@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AgentService, Formation, IMAGE_PAR_DEFAUT, SERVER } from '../agent.service';
+import { AgentService, Formation, IMAGE_PAR_DEFAUT } from '../agent.service';
 
 @Component({
   selector: 'app-formations-soumises',
@@ -13,7 +13,6 @@ import { AgentService, Formation, IMAGE_PAR_DEFAUT, SERVER } from '../agent.serv
 })
 export class FormationsSoumises implements OnInit {
   private service = inject(AgentService);
-  readonly serveur = SERVER;
   readonly placeholder = IMAGE_PAR_DEFAUT;
 
   q = '';
@@ -59,8 +58,10 @@ export class FormationsSoumises implements OnInit {
     this.rechercher();
   }
 
-  urlImage(f: Formation): string {
-    return f.image?.url ? this.serveur + f.image.url : this.placeholder;
+  // Les fichiers (/api/fichiers) sont réservés au formateur propriétaire : une balise <img>
+  // ne peut pas les afficher pour un agent. Image neutre en attendant une route dédiée.
+  urlImage(_f: Formation): string {
+    return this.placeholder;
   }
 
   imageErreur(e: Event) {
