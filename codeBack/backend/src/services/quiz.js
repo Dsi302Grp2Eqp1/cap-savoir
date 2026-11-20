@@ -47,6 +47,11 @@ async function creerOuModifierQuiz(utilisateur, formationId, chapitreId, donnees
     'formateur._id': utilisateur._id,
   });
   if (!formation) throw new ErreurApi(404, 'Formation introuvable.');
+  // Comme les chapitres (US09) : une formation soumise ou publiée n'est plus modifiable,
+  // sinon le quiz changerait sans nouvelle validation de l'agent (US12/US13).
+  if (formation.statut !== 'BROUILLON') {
+    throw new ErreurApi(409, 'Seuls les brouillons peuvent être modifiés.');
+  }
 
   const chapitre = formation.chapitres.id(chapitreId);
   if (!chapitre) throw new ErreurApi(404, 'Chapitre introuvable.');
@@ -86,9 +91,15 @@ async function creerOuModifierQuiz(utilisateur, formationId, chapitreId, donnees
   return Quiz.create(payload);
 }
 
-async function obtenirQuiz(formationId, chapitreId) {
+async function obtenirQuiz(utilisateur, formationId, chapitreId) {
   verifierIdentifiant(formationId);
   verifierIdentifiant(chapitreId);
+  // Le quiz contient les bonnes réponses : seul le formateur propriétaire peut le lire.
+  const formation = await Formation.findOne({
+    _id: formationId,
+    'formateur._id': utilisateur._id,
+  });
+  if (!formation) throw new ErreurApi(404, 'Formation introuvable.');
   const quiz = await Quiz.findOne({ formationId, chapitreId });
   if (!quiz) throw new ErreurApi(404, 'Aucun quiz pour ce chapitre.');
   return quiz;
@@ -96,20 +107,70 @@ async function obtenirQuiz(formationId, chapitreId) {
 
 // ─── US23 : Passer un quiz / US24 : Correction automatique ──────────────────
 
+// US23 : seul un apprenant inscrit (paiement confirmé) peut passer le quiz.
+async function verifierInscriptionActive(utilisateur, formationId) {
+  const inscription = await Inscription.findOne({
+    apprenantId: utilisateur._id,
+    formationId,
+    statut: 'ACTIVE',
+  });
+  if (!inscription) {
+    throw new ErreurApi(403, 'Vous devez être inscrit à cette formation pour passer ce quiz.');
+  }
+}
+
+// US23 : quiz à passer, sans les bonnes réponses.
+async function obtenirQuizPassage(utilisateur, quizId) {
+  verifierIdentifiant(quizId);
+  const quiz = await Quiz.findById(quizId);
+  if (!quiz) throw new ErreurApi(404, 'Quiz introuvable.');
+  await verifierInscriptionActive(utilisateur, quiz.formationId);
+
+  return {
+    _id: quiz._id,
+    titre: quiz.titre,
+    scoreMinimum: quiz.scoreMinimum,
+    formationId: quiz.formationId,
+    chapitreId: quiz.chapitreId,
+    questions: quiz.questions.map((q) => ({
+      _id: q._id,
+      enonce: q.enonce,
+      points: q.points,
+      propositions: q.propositions.map((p) => ({
+        _id: p._id,
+        texte: p.texte,
+      })),
+    })),
+  };
+}
+
+// Chaque question doit avoir une réponse choisie parmi ses propres propositions.
+function verifierReponses(quiz, reponses) {
+  if (!Array.isArray(reponses)) throw new ErreurApi(400, 'Réponses invalides.');
+  for (const question of quiz.questions) {
+    const reponse = reponses.find(
+      (r) => r && r.questionId && r.questionId.toString() === question._id.toString(),
+    );
+    if (!reponse || !reponse.propositionId) {
+      throw new ErreurApi(400, 'Répondez à toutes les questions avant de soumettre.');
+    }
+    if (
+      !isObjectIdOrHexString(reponse.propositionId) ||
+      !question.propositions.id(reponse.propositionId)
+    ) {
+      throw new ErreurApi(400, 'Réponse invalide pour une question.');
+    }
+  }
+}
+
 async function soumettreTentative(utilisateur, quizId, donnees) {
   verifierIdentifiant(quizId);
   const quiz = await Quiz.findById(quizId);
   if (!quiz) throw new ErreurApi(404, 'Quiz introuvable.');
 
   // Vérifier que l'apprenant est inscrit à la formation (accès autorisé)
-  const inscription = await Inscription.findOne({
-    apprenantId: utilisateur._id,
-    formationId: quiz.formationId,
-    statut: 'ACTIVE',
-  });
-  if (!inscription) {
-    throw new ErreurApi(403, 'Vous devez être inscrit à cette formation pour passer ce quiz.');
-  }
+  await verifierInscriptionActive(utilisateur, quiz.formationId);
+  verifierReponses(quiz, donnees.reponses || []);
 
   // Numéro de tentative = max existant + 1
   const derniereT = await Tentative.findOne(
@@ -188,6 +249,7 @@ async function obtenirResultat(utilisateur, tentativeId) {
 module.exports = {
   creerOuModifierQuiz,
   obtenirQuiz,
+  obtenirQuizPassage,
   soumettreTentative,
   obtenirResultat,
 };

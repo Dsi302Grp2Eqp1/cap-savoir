@@ -26,32 +26,7 @@ router.get(
   '/quiz/:quizId/passer',
   authentifier,
   exigerRole('APPRENANT'),
-  async (req, res, next) => {
-    try {
-      const { Quiz } = require('../models');
-      const quiz = await Quiz.findById(req.params.quizId);
-      if (!quiz) return res.status(404).json({ erreur: 'Quiz introuvable.' });
-      const quizSanitise = {
-        _id: quiz._id,
-        titre: quiz.titre,
-        scoreMinimum: quiz.scoreMinimum,
-        formationId: quiz.formationId,
-        chapitreId: quiz.chapitreId,
-        questions: quiz.questions.map((q) => ({
-          _id: q._id,
-          enonce: q.enonce,
-          points: q.points,
-          propositions: q.propositions.map((p) => ({
-            _id: p._id,
-            texte: p.texte,
-          })),
-        })),
-      };
-      res.json(quizSanitise);
-    } catch (err) {
-      next(err);
-    }
-  },
+  ctrl.obtenirQuizPassage,
 );
 
 // Soumettre une tentative (correction auto + calcul score US24)

@@ -15,10 +15,16 @@ async function creerOuModifierQuiz(req, res) {
 // Obtenir le quiz d'un chapitre
 async function obtenirQuiz(req, res) {
   const quiz = await service.obtenirQuiz(
+    req.utilisateur,
     req.params.formationId,
     req.params.chapitreId,
   );
   res.json(quiz);
+}
+
+// US23 — Apprenant : quiz à passer (bonnes réponses masquées)
+async function obtenirQuizPassage(req, res) {
+  res.json(await service.obtenirQuizPassage(req.utilisateur, req.params.quizId));
 }
 
 // US23 + US24 — Apprenant : soumettre une tentative et recevoir le score
@@ -43,6 +49,7 @@ async function obtenirResultat(req, res) {
 module.exports = {
   creerOuModifierQuiz,
   obtenirQuiz,
+  obtenirQuizPassage,
   soumettreTentative,
   obtenirResultat,
 };
