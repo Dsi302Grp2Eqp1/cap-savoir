@@ -1,0 +1,17 @@
+<!-- US18 : page de paiement d'une formation. -->
+<section class="carte">
+  <span class="eyebrow">PAIEMENT</span>
+  <h2>Payer cette formation</h2>
+  <p class="muted">
+    Vous allez être redirigé vers la page de paiement sécurisée. Aucune donnée de carte n'est
+    saisie ni enregistrée sur CapSavoir.
+  </p>
+
+  @if (erreur()) {
+    <p class="erreur" role="alert">{{ erreur() }}</p>
+  }
+
+  <button class="bouton" type="button" (click)="payer()" [disabled]="charge()">
+    {{ charge() ? 'Redirection…' : 'Payer' }}
+  </button>
+</section>

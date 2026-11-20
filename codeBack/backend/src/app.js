@@ -10,6 +10,10 @@ app.use(cors({
   origin: ['https://dsi302grp2eqp1.github.io', 'http://localhost:4200', 'http://127.0.0.1:4200'],
   credentials: true
 }));
+// Webhook Stripe (US18). DOIT rester AVANT express.json() : Stripe signe le corps
+// brut de la requête, et express.json() le transforme et casse la vérification.
+app.post('/api/paiements/webhook', express.raw({ type: 'application/json' }),
+  require('./controllers/paiements').webhook);
 app.use(express.json());
 
 // Used by the pipeline smoke test. Must stay public and return 200.
@@ -30,6 +34,8 @@ app.get('/health/db', async (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/formations', require('./routes/formations'));
 app.use('/api/fichiers', require('./routes/fichiers'));
+app.use('/api/paiements', require('./routes/paiements')); // US18
+app.use('/api/contenu', require('./routes/contenu')); // US19
 app.use((req, res) => res.status(404).json({ erreur: 'Route introuvable.' }));
 app.use(require('./middlewares/erreurs'));
 

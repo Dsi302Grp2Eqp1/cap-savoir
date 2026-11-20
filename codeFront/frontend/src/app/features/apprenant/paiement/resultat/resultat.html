@@ -1,0 +1,36 @@
+<!-- US18 : résultat du paiement après retour de la passerelle. -->
+<section class="carte">
+  <span class="eyebrow">PAIEMENT</span>
+
+  @if (charge()) {
+    <h2>Vérification du paiement…</h2>
+  } @else if (erreur()) {
+    <h2>Paiement introuvable</h2>
+    <p class="erreur" role="alert">{{ erreur() }}</p>
+    <a class="lien" routerLink="/apprenant">Retour à mon espace</a>
+  } @else if (statut()?.paiement === 'CONFIRME') {
+    <h2>Paiement confirmé</h2>
+    <p class="muted">Votre inscription est active.</p>
+    @if (formationId) {
+      <a class="lien" [routerLink]="['/apprenant/formation', formationId]">Accéder à la formation</a>
+    }
+    <a class="lien" routerLink="/apprenant">Retour à mon espace</a>
+  } @else if (statut()?.paiement === 'ECHOUE') {
+    <h2>Paiement échoué</h2>
+    <p class="muted">Aucun accès n'a été accordé.</p>
+    @if (formationId) {
+      <a class="lien" [routerLink]="['/apprenant/paiement', formationId]">Payer à nouveau</a>
+    }
+    <a class="lien" routerLink="/apprenant">Retour à mon espace</a>
+  } @else {
+    <h2>Paiement non finalisé</h2>
+    <p class="muted">
+      Aucun accès n'est accordé tant que le paiement n'est pas confirmé. Si vous venez de payer,
+      vérifiez à nouveau dans quelques secondes.
+    </p>
+    @if (formationId) {
+      <a class="lien" [routerLink]="['/apprenant/paiement', formationId]">Payer à nouveau</a>
+    }
+    <button class="bouton" type="button" (click)="verifier()">Vérifier à nouveau</button>
+  }
+</section>
