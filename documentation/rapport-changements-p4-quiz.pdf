@@ -1,0 +1,130 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+6 0 obj
+<< /Length 1879 >>
+stream
+BT
+/F1 18 Tf
+50 780 Td
+(CapSavoir - Rapport Module P4 Quiz (BV Haute)) Tj
+ET
+BT
+/F1 13 Tf
+50 740 Td
+(1. Contexte et Scope P4 (Business Value Haute)) Tj
+ET
+BT
+/F2 10 Tf
+60 720 Td
+(Branche: feature/p4-quiz) Tj
+ET
+BT
+/F2 10 Tf
+60 705 Td
+(Referentiel: Backlog VF) Tj
+ET
+BT
+/F2 10 Tf
+60 690 Td
+(User Stories realisees: US22, US23, US24 \\(Priorite et Business Value Haute\\)) Tj
+ET
+BT
+/F1 13 Tf
+50 665 Td
+(2. User Stories Incluses) Tj
+ET
+BT
+/F2 10 Tf
+60 645 Td
+(- US22 \\(Formateur\\): Fournir les questions des quiz associees aux chapitres avec score minimum) Tj
+ET
+BT
+/F2 10 Tf
+60 630 Td
+(- US23 \\(Apprenant\\): Passer des quiz interactifs avec enregistrement des reponses et tentative numerotee) Tj
+ET
+BT
+/F2 10 Tf
+60 615 Td
+(- US24 \\(Apprenant\\): Correction automatique des reponses, calcul du score et validation immediate) Tj
+ET
+BT
+/F1 13 Tf
+50 590 Td
+(3. Backend (Node.js / Express / MongoDB)) Tj
+ET
+BT
+/F2 10 Tf
+60 570 Td
+(- src/services/quiz.js : gestion quiz, verification formateur, calcul de score automatique) Tj
+ET
+BT
+/F2 10 Tf
+60 555 Td
+(- src/controllers/quiz.js : endpoints REST formateur et apprenant) Tj
+ET
+BT
+/F2 10 Tf
+60 540 Td
+(- src/routes/quiz.js : routes securisees JWT et roles \\(FORMATEUR / APPRENANT\\)) Tj
+ET
+BT
+/F2 10 Tf
+60 525 Td
+(- src/app.js : montage des routes quiz sous /api) Tj
+ET
+BT
+/F1 13 Tf
+50 500 Td
+(4. Frontend (Angular 20 Standalone)) Tj
+ET
+BT
+/F2 10 Tf
+60 480 Td
+(- quiz-editeur \\(US22 Formateur\\): creation/edition de questions, propositions et scoreMinimum) Tj
+ET
+BT
+/F2 10 Tf
+60 465 Td
+(- quiz-passage \\(US23 Apprenant\\): interface interactive question par question avec barre de progression) Tj
+ET
+BT
+/F2 10 Tf
+60 450 Td
+(- quiz-resultat \\(US24 Apprenant\\): affichage instantane du score, statut de reussite et option de reprise) Tj
+ET
+BT
+/F2 10 Tf
+60 435 Td
+(- src/app/app.routes.ts : routes securisees par roleGuard) Tj
+ET
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000244 00000 n 
+0000000318 00000 n 
+0000000387 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+2339
+%%EOF

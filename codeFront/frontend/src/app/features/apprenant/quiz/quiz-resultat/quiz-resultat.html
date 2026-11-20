@@ -1,0 +1,42 @@
+@if (charge()) {
+  <div class="center"><p class="loading" role="status">Chargement…</p></div>
+} @else if (erreur()) {
+  <div class="notice error" role="alert">{{ erreur() }}</div>
+} @else if (resultat(); as r) {
+  <div class="resultat-wrapper">
+
+    <!-- Score principal (US24) -->
+    <div class="score-card" [class.valide]="r.tentative.valide" [class.echoue]="!r.tentative.valide">
+      <div class="score-cercle">
+        <span class="score-valeur">{{ r.tentative.score }}%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <div class="score-info">
+        <h2>{{ r.tentative.valide ? '🎉 Quiz validé !' : '📝 Quiz non validé' }}</h2>
+        <p class="muted">
+          {{ r.quiz.titre }} · Tentative n°{{ r.tentative.numeroTentative }}
+        </p>
+        <p class="muted">
+          Score minimum requis : <strong>{{ r.quiz.scoreMinimum }}%</strong>
+        </p>
+        @if (!r.tentative.valide) {
+          <p class="conseil">
+            Vous n'avez pas atteint le score minimum de réussite. Vous pouvez repasser le quiz pour améliorer votre note.
+          </p>
+        } @else {
+          <p class="succes-msg">
+            Félicitations ! Vous avez atteint le score minimum et validé ce quiz.
+          </p>
+        }
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button type="button" (click)="repasser()">🔄 Repasser le quiz</button>
+      <button type="button" class="btn-ghost" (click)="retourEspace()">
+        🏠 Mon espace
+      </button>
+    </div>
+  </div>
+}

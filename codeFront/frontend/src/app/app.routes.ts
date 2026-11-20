@@ -26,6 +26,8 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/auth/inscription/inscription').then((m) => m.Inscription),
   },
+
+  // ─── Espace apprenant ─────────────────────────────────────────────────────
   // US18 : paiement d'une formation par l'apprenant.
   {
     path: 'apprenant/paiement/:formationId',
@@ -46,6 +48,22 @@ export const routes: Routes = [
       import('./features/espaces/espace-apprenant/espace-apprenant').then((m) => m.EspaceApprenant),
   },
   {
+    // US23 — Passer un quiz
+    path: 'apprenant/quiz/:quizId/passer',
+    canActivate: [roleGuard('APPRENANT')],
+    loadComponent: () =>
+      import('./features/apprenant/quiz/quiz-passage/quiz-passage').then((m) => m.QuizPassage),
+  },
+  {
+    // US24 — Résultat immédiat après soumission
+    path: 'apprenant/quiz/:quizId/resultat/:tentativeId',
+    canActivate: [roleGuard('APPRENANT')],
+    loadComponent: () =>
+      import('./features/apprenant/quiz/quiz-resultat/quiz-resultat').then((m) => m.QuizResultat),
+  },
+
+  // ─── Espace formateur ─────────────────────────────────────────────────────
+  {
     path: 'formateur',
     canActivate: [roleGuard('FORMATEUR')],
     loadComponent: () =>
@@ -53,8 +71,15 @@ export const routes: Routes = [
         (m) => m.EspaceFormateur,
       ),
   },
+  {
+    // US22 — Créer/modifier le quiz d'un chapitre
+    path: 'formateur/formations/:formationId/chapitres/:chapitreId/quiz',
+    canActivate: [roleGuard('FORMATEUR')],
+    loadComponent: () =>
+      import('./features/apprenant/quiz/quiz-editeur/quiz-editeur').then((m) => m.QuizEditeur),
+  },
 
-  // US39, US40, US12 (P3) : espace agent
+  // ─── Espace agent (US39, US40, US12) ──────────────────────────────────────
   {
     path: 'agent/formations',
     canActivate: [roleGuard('AGENT')],

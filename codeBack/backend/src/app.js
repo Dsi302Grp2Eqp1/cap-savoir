@@ -39,6 +39,8 @@ app.use('/api/fichiers', require('./routes/fichiers'));
 app.use('/api/paiements', require('./routes/paiements')); // US18
 app.use('/api/contenu', require('./routes/contenu'));     // US19
 app.use('/api/agent', require('./routes/validation'));    // US39, US40, US12
+// P4 : Quiz (US22, US23, US24)
+app.use('/api', require('./routes/quiz'));
 
 app.use((req, res) => res.status(404).json({ erreur: 'Route introuvable.' }));
 app.use(require('./middlewares/erreurs'));

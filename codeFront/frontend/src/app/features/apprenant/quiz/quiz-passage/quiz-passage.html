@@ -1,0 +1,92 @@
+@if (chargement()) {
+  <div class="loading-state">
+    <p class="loading" role="status">Chargement du quiz…</p>
+  </div>
+} @else if (erreur()) {
+  <div class="notice error" role="alert">{{ erreur() }}</div>
+} @else if (quiz(); as q) {
+  <div class="quiz-wrapper">
+    <!-- En-tête -->
+    <header class="quiz-header">
+      <div>
+        <span class="eyebrow">QUIZ</span>
+        <h2>{{ q.titre }}</h2>
+        <p class="muted">Score minimum requis : <strong>{{ q.scoreMinimum }}%</strong></p>
+      </div>
+      <div class="progression-badge">
+        <span>{{ questionCourante() + 1 }} / {{ q.questions.length }}</span>
+      </div>
+    </header>
+
+    <!-- Barre de progression -->
+    <div class="barre-progression" role="progressbar"
+         [attr.aria-valuenow]="questionCourante() + 1"
+         [attr.aria-valuemax]="q.questions.length">
+      <div class="barre-remplie"
+           [style.width.%]="((questionCourante() + 1) / q.questions.length) * 100">
+      </div>
+    </div>
+
+    <!-- Question courante -->
+    @if (q.questions[questionCourante()]; as question) {
+      <section class="question-panel panel">
+        <span class="eyebrow">Question {{ questionCourante() + 1 }} · {{ question.points }} pt(s)</span>
+        <h3>{{ question.enonce }}</h3>
+
+        <div class="propositions" role="radiogroup" [attr.aria-label]="question.enonce">
+          @for (prop of question.propositions; track prop._id) {
+            <label class="proposition-item"
+                   [class.selected]="reponseChoisie(question._id) === prop._id">
+              <input
+                type="radio"
+                [name]="'q-' + question._id"
+                [value]="prop._id"
+                [checked]="reponseChoisie(question._id) === prop._id"
+                (change)="choisirReponse(question._id, prop._id)"
+              />
+              <span class="prop-texte">{{ prop.texte }}</span>
+            </label>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Navigation -->
+    <div class="quiz-nav">
+      <button type="button" class="btn-ghost" (click)="precedent()"
+              [disabled]="questionCourante() === 0">
+        ← Précédent
+      </button>
+
+      @if (questionCourante() < q.questions.length - 1) {
+        <button type="button" (click)="suivant()"
+                [disabled]="!reponseChoisie(q.questions[questionCourante()]._id)">
+          Suivant →
+        </button>
+      } @else {
+        <button type="button" class="btn-submit"
+                (click)="soumettre()"
+                [disabled]="!toutesRepondu || charge()">
+          {{ charge() ? 'Envoi…' : 'Soumettre le quiz' }}
+        </button>
+      }
+    </div>
+
+    @if (erreur()) {
+      <div class="notice error" role="alert">{{ erreur() }}</div>
+    }
+
+    <!-- Indicateurs de questions répondues -->
+    <div class="dots-nav" aria-label="Navigation par question">
+      @for (question of q.questions; track question._id; let i = $index) {
+        <button type="button"
+                class="dot"
+                [class.active]="i === questionCourante()"
+                [class.done]="!!reponseChoisie(question._id)"
+                (click)="questionCourante.set(i)"
+                [attr.aria-label]="'Question ' + (i + 1)">
+        </button>
+      }
+    </div>
+  </div>
+}

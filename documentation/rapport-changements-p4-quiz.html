@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Rapport des changements - Module P4 Quiz - CapSavoir</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm;
+    }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #202438;
+      line-height: 1.6;
+      background: #fff;
+    }
+    .header {
+      border-bottom: 3px solid #6c3cf5;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+    .header h1 {
+      color: #6c3cf5;
+      margin: 0 0 8px 0;
+      font-size: 26px;
+    }
+    .header .meta {
+      color: #70778b;
+      font-size: 14px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 12px;
+      background: #eee9ff;
+      color: #6c3cf5;
+    }
+    h2 {
+      color: #202438;
+      border-bottom: 1px solid #e7e9f2;
+      padding-bottom: 6px;
+      margin-top: 24px;
+      font-size: 18px;
+    }
+    h3 {
+      color: #5122d4;
+      font-size: 15px;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid #e7e9f2;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background: #f7f8fc;
+      color: #202438;
+      font-weight: 700;
+    }
+    ul {
+      margin: 6px 0;
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+    .code-block {
+      background: #f7f8fc;
+      border-left: 3px solid #6c3cf5;
+      padding: 10px 14px;
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      margin: 10px 0;
+    }
+    .summary-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      padding: 14px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    .summary-box strong {
+      color: #00a884;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <span class="badge">CapSavoir E-Learning</span>
+    <h1>Rapport de Changements — Module P4 : Quiz</h1>
+    <div class="meta">
+      <strong>Branche Git :</strong> feature/p4-quiz &nbsp;|&nbsp;
+      <strong>Référentiel :</strong> Backlog VF &nbsp;|&nbsp;
+      <strong>Auteur :</strong> Équipe CapSavoir
+    </div>
+  </div>
+
+  <div class="summary-box">
+    <strong>Synthèse générale :</strong><br>
+    Ce document récapitule l'ensemble des développements réalisés pour le module <strong>P4 (Quiz)</strong> sur la plateforme CapSavoir, conformément au <strong>backlog VF</strong>. Les User Stories couvertes comprennent la création des quiz par les formateurs, le passage avec correction immédiate, la consultation des corrections et explications, l'historique des scores, ainsi que le tableau de bord global de progression de l'apprenant.
+  </div>
+
+  <h2>1. Périmètre fonctionnel couvert (Backlog VF)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>US</th>
+        <th>Rôle</th>
+        <th>Description</th>
+        <th>Priorité</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>US22</strong></td>
+        <td>Formateur</td>
+        <td>Fournir les questions des quiz associées aux chapitres avec score minimum de réussite (en %). 1 seule bonne réponse, au moins 1 mauvaise.</td>
+        <td>Haute</td>
+      </tr>
+      <tr>
+        <td><strong>US23</strong></td>
+        <td>Apprenant</td>
+        <td>Passer des quiz interactifs de ses formations avec questions et propositions (tentatives numérotées, dates de début et fin).</td>
+        <td>Haute</td>
+      </tr>
+      <tr>
+        <td><strong>US24</strong></td>
+        <td>Apprenant</td>
+        <td>Correction automatique des réponses, calcul instantané du score et validation par rapport au score minimum.</td>
+        <td>Haute</td>
+      </tr>
+      <tr>
+        <td><strong>US25</strong></td>
+        <td>Apprenant</td>
+        <td>Consulter les corrections détaillées et les explications associées aux questions après passage.</td>
+        <td>Moyenne</td>
+      </tr>
+      <tr>
+        <td><strong>US26</strong></td>
+        <td>Apprenant</td>
+        <td>Consulter le score de ses quiz et l'historique de ses tentatives (numéro, date, score, validation).</td>
+        <td>Moyenne</td>
+      </tr>
+      <tr>
+        <td><strong>US28</strong></td>
+        <td>Apprenant</td>
+        <td>Tableau de bord de ses résultats et de sa progression par formation (chapitres consultés et quiz validés).</td>
+        <td>Moyenne</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2. Modifications Backend (Node.js / Express / MongoDB)</h2>
+  <p>Les fichiers suivants ont été ajoutés et intégrés dans l'architecture MVC du backend :</p>
+  <ul>
+    <li><strong><code>src/services/quiz.js</code></strong> :
+      <ul>
+        <li><code>creerOuModifierQuiz</code> : Contrôle de propriété du formateur, validation de chaque question (au moins 2 propositions, exactement 1 réponse correcte, points positifs), gestion de l'unicité par chapitre.</li>
+        <li><code>soumettreTentative</code> : Vérification d'inscription active (sécurité), calcul automatique du numéro de tentative, algorithme de notation automatique, calcul du pourcentage et décision de validation.</li>
+        <li><code>obtenirCorrection</code> : Contrôle d'accès apprenant, fourniture du récapitulatif complet des questions, choix apprenant, statut exact et explications pédagogiques (US25).</li>
+        <li><code>listerTentativesApprenant</code> : Historique ordonné des tentatives pour le suivi des scores (US26).</li>
+        <li><code>tableauDeBord</code> : Agrégation MongoDB combinant formations actives, chapitres consultés et statistiques de quiz (meilleur score, validation, nombre d'essais) (US28).</li>
+      </ul>
+    </li>
+    <li><strong><code>src/controllers/quiz.js</code></strong> : Contrôleurs REST gérant les requêtes HTTP et le formatage des réponses JSON.</li>
+    <li><strong><code>src/routes/quiz.js</code></strong> : Définition des endpoints sécurisés par JWT et gardes de rôle :
+      <ul>
+        <li><code>PUT /api/formations/:formationId/chapitres/:chapitreId/quiz</code> (FORMATEUR)</li>
+        <li><code>GET /api/formations/:formationId/chapitres/:chapitreId/quiz</code> (FORMATEUR)</li>
+        <li><code>GET /api/quiz/:quizId/passer</code> (APPRENANT, sanitisation masquant les bonnes réponses)</li>
+        <li><code>POST /api/quiz/:quizId/tentatives</code> (APPRENANT, enregistrement et notation)</li>
+        <li><code>GET /api/tentatives/:tentativeId/correction</code> (APPRENANT)</li>
+        <li><code>GET /api/quiz/:quizId/scores</code> (APPRENANT)</li>
+        <li><code>GET /api/apprenant/dashboard</code> (APPRENANT)</li>
+      </ul>
+    </li>
+    <li><strong><code>src/app.js</code></strong> : Déclaration et montage des routes quiz sous <code>/api</code>.</li>
+  </ul>
+
+  <h2>3. Modifications Frontend (Angular 20 Standalone Components)</h2>
+  <p>Implémentation moderne respectant la charte graphique CapSavoir (lavande, violet principal, succès, cartes et typographie Inter/Segoe UI) :</p>
+  <ul>
+    <li><strong><code>src/app/features/apprenant/quiz/models/quiz.model.ts</code></strong> : Typage strict de l'ensemble des structures de données (Quiz, Questions, Propositions, Tentatives, Corrections, Dashboard).</li>
+    <li><strong><code>src/app/features/apprenant/quiz/services/quiz.service.ts</code></strong> : Service Angular injectant <code>ApiService</code> pour la consommation de toutes les routes quiz.</li>
+    <li><strong><code>src/app/features/apprenant/quiz/quiz-editeur/</code> (US22)</strong> :
+      <ul>
+        <li>Interface de saisie et de configuration des questions et des propositions avec sélecteur radio de la bonne réponse.</li>
+        <li>Gestion dynamique de l'ajout/suppression de questions et de propositions.</li>
+      </ul>
+    </li>
+    <li><strong><code>src/app/features/apprenant/quiz/quiz-passage/</code> (US23)</strong> :
+      <ul>
+        <li>Interface interactive de passage question par question avec barre de progression et sélecteurs de réponse.</li>
+        <li>Garantie de non-divulgation des réponses correctes avant la soumission.</li>
+      </ul>
+    </li>
+    <li><strong><code>src/app/features/apprenant/quiz/quiz-resultat/</code> (US24, US25)</strong> :
+      <ul>
+        <li>Affichage immédiat du score, statut validé/non validé, possibilité de repasser le quiz.</li>
+        <li>Section déroulante des corrections avec explications détaillées pour chaque question.</li>
+      </ul>
+    </li>
+    <li><strong><code>src/app/features/apprenant/quiz/quiz-scores/</code> (US26)</strong> :
+      <ul>
+        <li>Tableau récapitulatif de toutes les tentatives d'un quiz avec jauges de scores et liens vers les corrections passées.</li>
+      </ul>
+    </li>
+    <li><strong><code>src/app/features/apprenant/dashboard/</code> (US28)</strong> :
+      <ul>
+        <li>Tableau de bord de l'apprenant synthétisant les taux de progression des chapitres et des quiz pour chaque formation inscrite.</li>
+      </ul>
+    </li>
+    <li><strong><code>src/app/app.routes.ts</code> & <code>src/app/features/espaces/espace-apprenant/</code></strong> :
+      <ul>
+        <li>Déclaration des routes d'accès sécurisées par <code>roleGuard('APPRENANT')</code> et <code>roleGuard('FORMATEUR')</code>.</li>
+        <li>Lien rapide vers le tableau de bord depuis l'accueil de l'espace apprenant.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2>4. Workflow Git et État de la Branche</h2>
+  <ul>
+    <li><strong>Branche créée :</strong> <code>feature/p4-quiz</code> (créée à partir de <code>main</code> mise à jour avec le dernier <code>git pull</code>).</li>
+    <li><strong>Processus de validation :</strong> Conforme aux exigences du projet, le code sera fusionné dans <code>main</code> via Pull Request après validation par l'administrateur du projet.</li>
+  </ul>
+
+</body>
+</html>
