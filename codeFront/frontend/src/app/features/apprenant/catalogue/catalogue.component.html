@@ -1,0 +1,53 @@
+<div class="catalogue">
+  <h1>Catalogue des formations</h1>
+
+  <div class="filtres">
+    <input type="text" placeholder="Rechercher par titre" [(ngModel)]="titre" (keyup.enter)="rechercher()" />
+
+    <select [(ngModel)]="categorie">
+      <option value="">Toutes les catégories</option>
+      @for (c of categories(); track c) {
+        <option [value]="c">{{ c }}</option>
+      }
+    </select>
+
+    <input type="number" placeholder="Prix min" [(ngModel)]="prixMin" min="0" />
+    <input type="number" placeholder="Prix max" [(ngModel)]="prixMax" min="0" />
+
+    <button (click)="rechercher()">Rechercher</button>
+    <button class="secondaire" (click)="reinitialiser()">Réinitialiser</button>
+  </div>
+
+  @if (erreur()) {
+    <p class="erreur">{{ erreur() }}</p>
+  }
+
+  @if (message()) {
+    <p class="erreur">{{ message() }}</p>
+  }
+
+  @if (formations().length === 0 && !erreur()) {
+    <p class="vide">Aucune formation trouvée.</p>
+  }
+
+  <div class="grille">
+    @for (f of formations(); track f._id) {
+      <div class="carte">
+        <img [src]="urlImage(f)" [alt]="f.titre" />
+        <div class="contenu">
+          <h3>{{ f.titre }}</h3>
+          <p class="formateur">{{ f.formateur?.prenom }} {{ f.formateur?.nom }}</p>
+          <p class="categories">{{ f.categories?.join(', ') }}</p>
+          <p class="prix">{{ f.prix }} DT</p>
+          <button type="button" (click)="sInscrire(f)">S'inscrire</button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="pagination">
+    <button (click)="pagePrecedente()" [disabled]="page() === 1">Précédent</button>
+    <span>Page {{ page() }} / {{ totalPages() }}</span>
+    <button (click)="pageSuivante()" [disabled]="page() === totalPages()">Suivant</button>
+  </div>
+</div>

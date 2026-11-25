@@ -47,6 +47,9 @@
           Cette formation est en lecture seule. Seuls les brouillons sont modifiables.
         </p>
       }
+            @if (formation.statut === 'PUBLIEE') {
+        <app-modification-formation [formation]="formation" />
+      }
       <fieldset class="editor" [disabled]="charge() || formation.statut !== 'BROUILLON'">
         @for (chapitre of formation.chapitres; track chapitre._id; let i = $index) {
           <app-chapitre-editeur
