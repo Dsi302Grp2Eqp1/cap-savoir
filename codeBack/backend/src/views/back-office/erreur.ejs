@@ -1,0 +1,7 @@
+<%- include('partials/haut', { titre: 'Erreur' }) %>
+<section class="carte">
+  <h1>Erreur <%= statut %></h1>
+  <p><%= message %></p>
+  <p><a href="/backoffice/demandes">Retour aux demandes</a></p>
+</section>
+<%- include('partials/bas') %>

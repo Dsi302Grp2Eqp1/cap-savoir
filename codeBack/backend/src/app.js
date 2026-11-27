@@ -1,8 +1,13 @@
+const path = require('node:path');
 const express = require('express');
 const cors = require('cors');
 const { etatBase } = require('./db');
 
 const app = express();
+
+// Back-office agent : pages EJS rendues par le serveur (note d'architecture du projet).
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 app.use(cors({
   origin: [
@@ -33,6 +38,8 @@ app.get('/health/db', async (req, res) => {
   }
 });
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/demandes-formateur', require('./routes/demandes-formateur')); // US05, US07
+app.use('/backoffice', require('./routes/back-office'));                     // US06, US38 (EJS)
 app.use('/api/formations', require('./routes/formations'));
 app.use('/api/catalogue', require('./routes/catalogue')); // US16
 app.use('/api/inscriptions', require('./routes/inscriptions')); // US17

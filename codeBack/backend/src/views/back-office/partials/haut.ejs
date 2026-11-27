@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= titre %> · Back-office Cap Savoir</title>
+  <style>
+    :root {
+      --principale: #6c3cf5; --survol: #5122d4; --lavande: #eee9ff; --fond: #f7f8fc;
+      --surface: #fff; --texte: #202438; --secondaire: #70778b; --bordure: #e7e9f2;
+      --succes: #00a884; --erreur: #e5484d; --attente: #b7791f;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--fond); color: var(--texte); }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 32px; background: var(--surface); border-bottom: 1px solid var(--bordure); }
+    .marque { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--principale); text-decoration: none; }
+    .marque span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--principale); color: #fff; }
+    header nav { display: flex; align-items: center; gap: 12px; }
+    header nav a { color: var(--texte); text-decoration: none; font-weight: 600; }
+    main { max-width: 980px; margin: 0 auto; padding: 32px 20px 60px; }
+    h1 { font-size: 24px; margin: 0 0 4px; }
+    .muted { color: var(--secondaire); }
+    .carte { background: var(--surface); border: 1px solid var(--bordure); border-radius: 12px; padding: 24px; margin-top: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--bordure); vertical-align: top; }
+    th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--secondaire); }
+    a { color: var(--principale); }
+    .filtres { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .filtres a { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--bordure); background: var(--surface); text-decoration: none; color: var(--texte); }
+    .filtres a.actif { background: var(--lavande); border-color: var(--principale); color: var(--principale); font-weight: 600; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: .05em; }
+    .EN_ATTENTE { background: #fef3c7; color: var(--attente); }
+    .ACCEPTEE { background: #dcfce7; color: #067647; }
+    .REFUSEE { background: #fee2e2; color: #b42318; }
+    label { display: block; font-weight: 600; margin: 14px 0 6px; }
+    input, textarea { width: 100%; padding: 10px; border: 1px solid var(--bordure); border-radius: 8px; font: inherit; }
+    button { padding: 10px 16px; border: 0; border-radius: 8px; font: inherit; font-weight: 600; cursor: pointer; background: var(--principale); color: #fff; }
+    button:hover { background: var(--survol); }
+    button.danger { background: var(--erreur); }
+    button.lien { background: transparent; color: var(--texte); padding: 0; }
+    .actions { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+    .actions form { flex: 1 1 280px; }
+    .notice { padding: 10px 14px; border-radius: 8px; margin-top: 16px; }
+    .notice.erreur { background: #fee2e2; color: #b42318; }
+    .notice.succes { background: #dcfce7; color: #067647; }
+    dl { display: grid; grid-template-columns: 180px 1fr; gap: 8px 16px; margin: 0; }
+    dt { color: var(--secondaire); }
+    dd { margin: 0; white-space: pre-wrap; }
+    @media (max-width: 640px) { header { padding: 12px 16px; } dl { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="marque" href="/backoffice"><span>C</span>Back-office</a>
+    <% if (locals.agent) { %>
+      <nav>
+        <a href="/backoffice/demandes">Demandes formateur</a>
+        <span class="muted"><%= agent.prenom %> <%= agent.nom %></span>
+        <form method="post" action="/backoffice/deconnexion"><button class="lien" type="submit">Se déconnecter</button></form>
+      </nav>
+    <% } %>
+  </header>
+  <main>

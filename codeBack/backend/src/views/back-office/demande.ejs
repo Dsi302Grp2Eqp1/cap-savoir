@@ -1,0 +1,36 @@
+<%- include('partials/haut', { titre: 'Demande formateur' }) %>
+<p><a href="/backoffice/demandes">← Retour aux demandes</a></p>
+<h1><%= demande.demandeur.prenom %> <%= demande.demandeur.nom %></h1>
+<span class="badge <%= demande.statut %>"><%= libelles[demande.statut] %></span>
+
+<% if (message) { %><p class="notice succes"><%= message %></p><% } %>
+<% if (erreur) { %><p class="notice erreur" role="alert"><%= erreur %></p><% } %>
+
+<section class="carte">
+  <dl>
+    <dt>Envoyée le</dt><dd><%= formaterDate(demande.dateSoumission) %></dd>
+    <dt>Domaine d'expertise</dt><dd><%= demande.domaineExpertise %></dd>
+    <dt>Expérience</dt><dd><%= demande.experience %></dd>
+    <dt>CV</dt>
+    <dd><a href="/backoffice/demandes/<%= demande._id %>/cv"><%= demande.cv.nom %></a> (<%= Math.ceil(demande.cv.taille / 1024) %> Ko)</dd>
+    <% if (demande.statut !== 'EN_ATTENTE') { %>
+      <dt>Décision le</dt><dd><%= formaterDate(demande.dateDecision) %></dd>
+      <% if (demande.commentaire) { %><dt>Motif du refus</dt><dd><%= demande.commentaire %></dd><% } %>
+    <% } %>
+  </dl>
+</section>
+
+<% if (demande.statut === 'EN_ATTENTE') { %>
+  <section class="carte actions">
+    <form method="post" action="/backoffice/demandes/<%= demande._id %>/accepter">
+      <p class="muted">L'utilisateur recevra le rôle formateur et gardera son rôle apprenant.</p>
+      <button type="submit">Accepter la demande</button>
+    </form>
+    <form method="post" action="/backoffice/demandes/<%= demande._id %>/refuser">
+      <label for="motif">Motif du refus (obligatoire)</label>
+      <textarea id="motif" name="motif" rows="4" maxlength="2000" required></textarea>
+      <p><button class="danger" type="submit">Refuser la demande</button></p>
+    </form>
+  </section>
+<% } %>
+<%- include('partials/bas') %>

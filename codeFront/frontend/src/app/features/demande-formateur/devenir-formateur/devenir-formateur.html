@@ -1,0 +1,85 @@
+<section class="espace">
+  <span class="eyebrow">DEVENIR FORMATEUR</span>
+  <h2>Partagez votre savoir</h2>
+  <p class="muted">
+    Envoyez votre candidature : un agent l'examine et vous recevez le rôle formateur si elle est
+    acceptée. Vous gardez votre espace apprenant.
+  </p>
+
+  @if (erreur()) {
+    <p class="notice error" role="alert">{{ erreur() }}</p>
+  }
+  @if (succes()) {
+    <p class="notice success">{{ succes() }}</p>
+  }
+
+  <!-- US05 -->
+  @if (auth.aRole('FORMATEUR')) {
+    <p class="notice success">
+      Vous êtes formateur. <a routerLink="/formateur">Ouvrir l'espace formateur</a>
+    </p>
+  } @else if (!enAttente()) {
+    <form #form="ngForm" (ngSubmit)="form.valid && envoyer()" novalidate>
+      <fieldset [disabled]="charge()">
+        <label for="domaine">Domaine d'expertise</label>
+        <input
+          id="domaine"
+          name="domaineExpertise"
+          [(ngModel)]="domaineExpertise"
+          required
+          maxlength="200"
+          placeholder="Ex. : Développement web"
+          #champDomaine="ngModel"
+        />
+        @if (champDomaine.invalid && (champDomaine.touched || form.submitted)) {
+          <small class="champ-erreur">Indiquez votre domaine d'expertise.</small>
+        }
+
+        <label for="experience">Expérience</label>
+        <textarea
+          id="experience"
+          name="experience"
+          rows="5"
+          [(ngModel)]="experience"
+          required
+          maxlength="3000"
+          placeholder="Vos années d'expérience, vos réalisations, vos formations déjà données…"
+          #champExperience="ngModel"
+        ></textarea>
+        @if (champExperience.invalid && (champExperience.touched || form.submitted)) {
+          <small class="champ-erreur">Décrivez votre expérience.</small>
+        }
+
+        <label for="cv">CV <small>(PDF, 5 Mo maximum)</small></label>
+        <input id="cv" type="file" accept="application/pdf" (change)="choisirCv($event)" />
+        @if (erreurCv) {
+          <small class="champ-erreur">{{ erreurCv }}</small>
+        }
+
+        <button class="bouton" type="submit">
+          {{ charge() ? 'Envoi…' : 'Envoyer ma demande' }}
+        </button>
+      </fieldset>
+    </form>
+  }
+
+  <!-- US07 -->
+  @if (demandes().length) {
+    <h3>Mes demandes</h3>
+    <ul class="demandes">
+      @for (demande of demandes(); track demande._id) {
+        <li>
+          <span [class]="'statut ' + demande.statut">{{ libelles[demande.statut] }}</span>
+          <strong>{{ demande.domaineExpertise }}</strong>
+          <small>Envoyée le {{ demande.dateSoumission | date: 'dd/MM/yyyy HH:mm' }}</small>
+          @if (demande.dateDecision) {
+            <small>Décision le {{ demande.dateDecision | date: 'dd/MM/yyyy HH:mm' }}</small>
+          }
+          @if (demande.statut === 'REFUSEE' && demande.commentaire) {
+            <p class="motif">Motif : {{ demande.commentaire }}</p>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>

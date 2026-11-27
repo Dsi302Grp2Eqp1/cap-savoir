@@ -3,7 +3,8 @@
 app-connexion,
 app-inscription,
 app-espace-apprenant,
-app-espace-agent {
+app-espace-agent,
+app-devenir-formateur {
   display: block;
   padding: 48px 20px;
 
@@ -49,7 +50,8 @@ app-espace-agent {
     font-weight: 650;
     margin: 18px 0 8px;
   }
-  input {
+  input,
+  textarea {
     width: 100%;
     padding: 12px;
     border: 1px solid var(--couleur-bordure);
@@ -59,7 +61,8 @@ app-espace-agent {
     font: inherit;
     font-size: 14px;
   }
-  input:focus {
+  input:focus,
+  textarea:focus {
     outline: 2px solid var(--couleur-principale);
     outline-offset: 1px;
   }
@@ -118,6 +121,54 @@ app-espace-agent {
     color: var(--couleur-secondaire);
   }
   .bas-carte a {
+    color: var(--couleur-principale);
+    font-weight: 650;
+    text-decoration: none;
+  }
+  /* US07 : demandes formateur et leur statut. */
+  h3 {
+    margin: 28px 0 10px;
+    font-size: 16px;
+  }
+  .demandes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .demandes li {
+    padding: 12px 0;
+    border-top: 1px solid var(--couleur-bordure);
+  }
+  .demandes small {
+    display: inline;
+    margin: 0 0 0 10px;
+  }
+  .statut {
+    display: inline-block;
+    margin-right: 10px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--couleur-lavande);
+    color: var(--couleur-principale);
+  }
+  .statut.ACCEPTEE {
+    background: color-mix(in srgb, var(--couleur-succes) 14%, transparent);
+    color: var(--couleur-succes);
+  }
+  .statut.REFUSEE {
+    background: color-mix(in srgb, var(--couleur-erreur) 12%, transparent);
+    color: var(--couleur-erreur);
+  }
+  .motif {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--couleur-erreur);
+  }
+  .lien-action {
+    display: inline-block;
+    margin-top: 14px;
     color: var(--couleur-principale);
     font-weight: 650;
     text-decoration: none;

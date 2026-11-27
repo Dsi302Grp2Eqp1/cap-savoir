@@ -1,4 +1,4 @@
-const { Utilisateur } = require('../models');
+const utilisateurs = require('../repositories/utilisateurs');
 const ErreurApi = require('../utils/erreur-api');
 const motDePasse = require('../utils/mot-de-passe');
 const jeton = require('../utils/jeton');
@@ -46,7 +46,7 @@ async function inscrire(donnees) {
   }
 
   try {
-    const utilisateur = await Utilisateur.create({
+    const utilisateur = await utilisateurs.creer({
       nom,
       prenom,
       email,
@@ -67,9 +67,7 @@ async function inscrire(donnees) {
 // US02 : connexion. Le message d'erreur ne révèle pas le champ fautif.
 async function connecter(donnees) {
   const email = typeof donnees.email === 'string' ? donnees.email.trim().toLowerCase() : '';
-  const utilisateur = email
-    ? await Utilisateur.findOne({ email }).select('+motDePasse')
-    : null;
+  const utilisateur = email ? await utilisateurs.trouverParEmailAvecMotDePasse(email) : null;
 
   // La comparaison est faite même sans compte, pour un temps de réponse identique.
   const valide = await motDePasse.comparer(donnees.motDePasse, utilisateur?.motDePasse);
@@ -82,7 +80,7 @@ async function connecter(donnees) {
 
 // US02 : déconnexion. Incrémenter la version invalide tous les jetons déjà émis.
 async function deconnecter(utilisateur) {
-  await Utilisateur.updateOne({ _id: utilisateur._id }, { $inc: { versionJeton: 1 } });
+  await utilisateurs.incrementerVersionJeton(utilisateur._id);
 }
 
 module.exports = { inscrire, connecter, deconnecter, profilPublic };

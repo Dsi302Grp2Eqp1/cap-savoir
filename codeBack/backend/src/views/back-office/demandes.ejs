@@ -1,0 +1,34 @@
+<%- include('partials/haut', { titre: 'Demandes formateur' }) %>
+<h1>Demandes formateur</h1>
+<p class="muted">Candidatures des utilisateurs qui veulent devenir formateurs.</p>
+
+<nav class="filtres" aria-label="Filtrer par statut">
+  <% for (const s of statuts) { %>
+    <a href="?statut=<%= s %>" class="<%= s === statut ? 'actif' : '' %>"><%= libelles[s] %></a>
+  <% } %>
+  <a href="?statut=TOUTES" class="<%= statuts.includes(statut) ? '' : 'actif' %>">Toutes</a>
+</nav>
+
+<section class="carte">
+  <% if (!demandes.length) { %>
+    <p class="muted">Aucune demande.</p>
+  <% } else { %>
+    <table>
+      <thead>
+        <tr><th>Demandeur</th><th>Domaine d'expertise</th><th>Envoyée le</th><th>Statut</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% for (const d of demandes) { %>
+          <tr>
+            <td><%= d.demandeur.prenom %> <%= d.demandeur.nom %></td>
+            <td><%= d.domaineExpertise %></td>
+            <td><%= formaterDate(d.dateSoumission) %></td>
+            <td><span class="badge <%= d.statut %>"><%= libelles[d.statut] %></span></td>
+            <td><a href="/backoffice/demandes/<%= d._id %>">Ouvrir</a></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  <% } %>
+</section>
+<%- include('partials/bas') %>

@@ -5,4 +5,7 @@
     Retrouvez ici le catalogue, vos formations, vos quiz et vos certificats au fil des prochaines
     versions.
   </p>
+  @if (!aRole('FORMATEUR')) {
+    <a class="lien-action" routerLink="/apprenant/devenir-formateur">Devenir formateur →</a>
+  }
 </section>

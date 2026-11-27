@@ -1,0 +1,14 @@
+<%- include('partials/haut', { titre: 'Connexion' }) %>
+<section class="carte" style="max-width: 420px; margin: 40px auto 0;">
+  <h1>Connexion agent</h1>
+  <p class="muted">Réservé aux agents de la plateforme.</p>
+  <% if (erreur) { %><p class="notice erreur" role="alert"><%= erreur %></p><% } %>
+  <form method="post" action="/backoffice/connexion">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="username" value="<%= email %>" required>
+    <label for="motDePasse">Mot de passe</label>
+    <input id="motDePasse" name="motDePasse" type="password" autocomplete="current-password" required>
+    <p><button type="submit">Se connecter</button></p>
+  </form>
+</section>
+<%- include('partials/bas') %>

@@ -5,7 +5,7 @@
 //   router.use(authentifier, exigerRole('FORMATEUR'));
 //
 // Après authentifier, req.utilisateur contient { _id, nom, prenom, email, roles, dateCreation }.
-const { Utilisateur } = require('../models');
+const utilisateurs = require('../repositories/utilisateurs');
 const ErreurApi = require('../utils/erreur-api');
 const jeton = require('../utils/jeton');
 
@@ -16,21 +16,21 @@ function lireJeton(req) {
   return schema === 'Bearer' && valeur ? valeur : null;
 }
 
+// Partagé par l'API (en-tête Authorization) et le back-office (cookie).
+// Relu à chaque requête : rôles à jour et déconnexion effective immédiatement.
+async function utilisateurDepuisJeton(brut) {
+  if (!brut) throw new ErreurApi(401, 'Connexion requise.');
+  const contenu = jeton.verifier(brut);
+  const utilisateur = await utilisateurs.trouverPourSession(contenu.sub);
+  if (!utilisateur || (utilisateur.versionJeton ?? 0) !== contenu.v) {
+    throw new ErreurApi(401, 'Session expirée ou invalide. Reconnectez-vous.');
+  }
+  return utilisateur;
+}
+
 async function authentifier(req, res, next) {
   try {
-    const brut = lireJeton(req);
-    if (!brut) throw new ErreurApi(401, 'Connexion requise.');
-
-    const contenu = jeton.verifier(brut);
-    // Relu à chaque requête : rôles à jour et déconnexion effective immédiatement.
-    const utilisateur = await Utilisateur.findById(contenu.sub).select(
-      'nom prenom email roles dateCreation versionJeton',
-    );
-    if (!utilisateur || (utilisateur.versionJeton ?? 0) !== contenu.v) {
-      throw new ErreurApi(401, 'Session expirée ou invalide. Reconnectez-vous.');
-    }
-
-    req.utilisateur = utilisateur;
+    req.utilisateur = await utilisateurDepuisJeton(lireJeton(req));
     next();
   } catch (err) {
     next(err);
@@ -52,4 +52,4 @@ function exigerRole(...roles) {
   };
 }
 
-module.exports = { authentifier, exigerRole, ROLES };
+module.exports = { authentifier, exigerRole, utilisateurDepuisJeton, ROLES };

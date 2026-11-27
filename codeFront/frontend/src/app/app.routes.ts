@@ -50,6 +50,15 @@ export const routes: Routes = [
       import('./features/apprenant/paiement/resultat/resultat').then((m) => m.Resultat),
   },
   {
+    // US05 / US07 : demande pour devenir formateur et suivi de la décision.
+    path: 'apprenant/devenir-formateur',
+    canActivate: [roleGuard('APPRENANT')],
+    loadComponent: () =>
+      import('./features/demande-formateur/devenir-formateur/devenir-formateur').then(
+        (m) => m.DevenirFormateur,
+      ),
+  },
+  {
     path: 'apprenant',
     canActivate: [roleGuard('APPRENANT')],
     loadComponent: () =>
