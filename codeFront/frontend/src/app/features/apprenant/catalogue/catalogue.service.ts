@@ -1,22 +1,24 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { ApiService } from '../../../core/api.service';
+
+const API = '/api/catalogue';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogueService {
-  private http = inject(HttpClient);
-  private url = 'http://localhost:3000/api/catalogue';
+  private api = inject(ApiService);
 
   rechercher(filtres: any) {
-    let params = new HttpParams();
+    const params = new URLSearchParams();
     for (const cle of Object.keys(filtres)) {
       if (filtres[cle] !== '' && filtres[cle] !== null && filtres[cle] !== undefined) {
-        params = params.set(cle, filtres[cle]);
+        params.set(cle, String(filtres[cle]));
       }
     }
-    return this.http.get<any>(this.url, { params });
+    const requete = params.toString();
+    return this.api.get<any>(requete ? `${API}?${requete}` : API);
   }
 
   listerCategories() {
-    return this.http.get<string[]>(this.url + '/categories');
+    return this.api.get<string[]>(`${API}/categories`);
   }
 }

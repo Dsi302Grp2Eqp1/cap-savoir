@@ -30,7 +30,7 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: codeFront/frontend/package-lock.json
-      - run: npm install
+      - run: npm ci
       - run: npm run lint --if-present
       - run: npx ng test --watch=false
         if: ${{ vars.RUN_FRONT_TESTS == 'true' }}

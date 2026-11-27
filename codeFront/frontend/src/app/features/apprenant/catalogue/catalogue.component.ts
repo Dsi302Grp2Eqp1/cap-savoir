@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CatalogueService } from './catalogue.service';
 import { InscriptionService } from './inscription.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { IMAGE_PAR_DEFAUT } from '../../agent/agent.service';
 
 @Component({
   selector: 'app-catalogue',
@@ -71,15 +72,14 @@ export class CatalogueComponent implements OnInit {
     this.rechercher();
   }
 
+  // Les fichiers (/api/fichiers) sont réservés au formateur propriétaire : le
+  // catalogue public ne peut pas les lire. Image neutre en attendant une route publique.
   urlImage(formation: any) {
     const url = formation.image?.url;
-    if (!url) {
-      return '';
-    }
-    if (url.startsWith('http')) {
+    if (url && url.startsWith('http')) {
       return url;
     }
-    return 'http://localhost:3000' + url;
+    return IMAGE_PAR_DEFAUT;
   }
 
   pagePrecedente() {

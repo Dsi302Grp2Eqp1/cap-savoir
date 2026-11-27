@@ -1,14 +1,22 @@
 const { Formation } = require('../models');
 
+const LIMITE_MAX = 50;
+
+// Le texte saisi est cherché tel quel : les caractères spéciaux des expressions
+// régulières sont échappés (sinon "(a+)+$" pourrait bloquer la requête).
+function echapperRegex(texte) {
+  return texte.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 async function rechercher(requete) {
   const filtre = { statut: 'PUBLIEE' };
 
   if (requete.titre) {
-    filtre.titre = { $regex: requete.titre, $options: 'i' };
+    filtre.titre = { $regex: echapperRegex(String(requete.titre)), $options: 'i' };
   }
 
   if (requete.categorie) {
-    filtre.categories = requete.categorie;
+    filtre.categories = String(requete.categorie);
   }
 
   if (requete.prixMin || requete.prixMax) {
@@ -21,8 +29,8 @@ async function rechercher(requete) {
     }
   }
 
-  const page = Number(requete.page) || 1;
-  const limite = Number(requete.limit) || 9;
+  const page = Math.max(1, Math.floor(Number(requete.page)) || 1);
+  const limite = Math.min(LIMITE_MAX, Math.max(1, Math.floor(Number(requete.limit)) || 9));
   const debut = (page - 1) * limite;
 
   const formations = await Formation.find(filtre)
