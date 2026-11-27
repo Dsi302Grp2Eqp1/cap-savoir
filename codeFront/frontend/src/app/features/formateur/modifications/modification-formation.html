@@ -1,0 +1,31 @@
+<section class="panel">
+  <h3>Modifier cette formation publiée</h3>
+  <p>La version publiée reste visible pendant la validation par l'agent.</p>
+
+  <input type="text" placeholder="Titre" [(ngModel)]="titre" />
+  <textarea placeholder="Description" [(ngModel)]="description"></textarea>
+  <input type="text" placeholder="Catégories (séparées par des virgules)" [(ngModel)]="categories" />
+  <input type="number" placeholder="Prix" min="0" [(ngModel)]="prix" />
+
+  <button type="button" (click)="envoyer()">Envoyer à l'agent</button>
+
+  @if (message()) {
+    <p class="notice success">{{ message() }}</p>
+  }
+  @if (erreur()) {
+    <p class="notice error">{{ erreur() }}</p>
+  }
+
+  <h4>Suivi de mes modifications</h4>
+  @if (demandes().length === 0) {
+    <p>Aucune modification envoyée.</p>
+  }
+  @for (d of demandes(); track d._id) {
+    <p>
+      {{ d.dateSoumission | date: 'dd/MM/yyyy HH:mm' }} :
+      @if (d.statut === 'EN_ATTENTE') { En attente }
+      @if (d.statut === 'ACCEPTEE') { Acceptée }
+      @if (d.statut === 'REFUSEE') { Refusée : {{ d.commentaire }} }
+    </p>
+  }
+</section>

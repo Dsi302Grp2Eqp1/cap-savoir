@@ -14,7 +14,7 @@ import { RessourcesChapitre } from '../ressources/ressources-chapitre/ressources
 import { Formation, FormulaireFormation } from '../formations/models/formation.model';
 import { Chapitre, BrouillonChapitre } from '../chapitres/models/chapitre.model';
 import { Ressource, BrouillonRessource } from '../ressources/models/ressource.model';
-
+import { ModificationFormation } from '../modifications/modification-formation';
 @Component({
   selector: 'app-espace-formateur',
   imports: [
@@ -24,7 +24,8 @@ import { Ressource, BrouillonRessource } from '../ressources/models/ressource.mo
     ChapitreEditeur,
     ChapitreFormulaire,
     RessourcesChapitre,
-  ],
+    ModificationFormation
+],
   templateUrl: './espace-formateur.html',
   styleUrl: './espace-formateur.css',
 })

@@ -27,6 +27,14 @@ export const routes: Routes = [
       import('./features/auth/inscription/inscription').then((m) => m.Inscription),
   },
 
+  // US16 : catalogue public (consultable sans connexion).
+   {
+    path: 'catalogue',
+    loadComponent: () =>
+      import('./features/apprenant/catalogue/catalogue.component').then(
+        (m) => m.CatalogueComponent,
+      ),
+  },
   // ─── Espace apprenant ─────────────────────────────────────────────────────
   // US18 : paiement d'une formation par l'apprenant.
   {
@@ -93,6 +101,12 @@ export const routes: Routes = [
     canActivate: [roleGuard('AGENT')],
     loadComponent: () =>
       import('./features/agent/formation-detail/formation-detail').then((m) => m.FormationDetail),
+  },
+    {
+    path: 'agent/modifications',
+    canActivate: [roleGuard('AGENT')],
+    loadComponent: () =>
+      import('./features/agent/modifications/modifications').then((m) => m.Modifications),
   },
   {
     path: 'agent',

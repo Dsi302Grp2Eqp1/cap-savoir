@@ -32,17 +32,19 @@ app.get('/health/db', async (req, res) => {
     res.status(503).json({ ok: false, erreur: 'base inaccessible' });
   }
 });
-
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/formations', require('./routes/formations'));
+app.use('/api/catalogue', require('./routes/catalogue')); // US16
+app.use('/api/inscriptions', require('./routes/inscriptions')); // US17
+app.use('/api/modifications', require('./routes/modifications')); // US13
 app.use('/api/fichiers', require('./routes/fichiers'));
 app.use('/api/paiements', require('./routes/paiements')); // US18
 app.use('/api/contenu', require('./routes/contenu'));     // US19
+app.use('/api/agent/modifications', require('./routes/modifications-agent')); // US14
 app.use('/api/agent', require('./routes/validation'));    // US39, US40, US12
 // P4 : Quiz (US22, US23, US24)
 app.use('/api', require('./routes/quiz'));
 
 app.use((req, res) => res.status(404).json({ erreur: 'Route introuvable.' }));
 app.use(require('./middlewares/erreurs'));
-
 module.exports = app;

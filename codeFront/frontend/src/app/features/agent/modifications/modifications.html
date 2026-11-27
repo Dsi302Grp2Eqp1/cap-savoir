@@ -1,0 +1,81 @@
+<main class="page">
+  <a class="retour" routerLink="/agent/formations">← Retour aux formations</a>
+
+  <p class="eyebrow">Espace agent</p>
+  <h1>Modifications en attente</h1>
+  <p class="sous-titre">Examinez les modifications proposées sur les formations publiées.</p>
+
+  @if (erreur()) {
+    <div class="alerte alerte-erreur">{{ erreur() }}</div>
+  }
+  @if (succes()) {
+    <div class="alerte alerte-succes">{{ succes() }}</div>
+  }
+
+  @if (liste().length === 0) {
+    <div class="vide">Aucune modification en attente.</div>
+  }
+
+  <section class="grille">
+    @for (m of liste(); track m._id) {
+      <div class="carte">
+        <span class="badge">EN ATTENTE</span>
+        <h3>{{ m.titreActuel }}</h3>
+        <p class="meta">{{ m.demandeur.prenom }} {{ m.demandeur.nom }}</p>
+        <p class="meta">Envoyée le {{ m.dateSoumission | date: 'dd/MM/yyyy HH:mm' }}</p>
+        <div class="actions">
+          <button type="button" class="btn btn-primaire" (click)="ouvrir(m._id)">Examiner</button>
+        </div>
+      </div>
+    }
+  </section>
+
+  @if (selection(); as s) {
+    <section class="bloc">
+      <h2>Comparaison avec la version publiée</h2>
+      <div class="tableau-scroll">
+        <table>
+          <tr>
+            <th></th>
+            <th>Version publiée</th>
+            <th>Modification proposée</th>
+          </tr>
+          <tr>
+            <td>Titre</td>
+            <td>{{ s.formation.titre }}</td>
+            <td [class.change]="different('titre')">{{ s.demande.contenuPropose.titre }}</td>
+          </tr>
+          <tr>
+            <td>Description</td>
+            <td>{{ s.formation.description }}</td>
+            <td [class.change]="different('description')">{{ s.demande.contenuPropose.description }}</td>
+          </tr>
+          <tr>
+            <td>Catégories</td>
+            <td>{{ s.formation.categories.join(', ') }}</td>
+            <td [class.change]="different('categories')">{{ s.demande.contenuPropose.categories.join(', ') }}</td>
+          </tr>
+          <tr>
+            <td>Prix</td>
+            <td>{{ s.formation.prix }} TND</td>
+            <td [class.change]="different('prix')">{{ s.demande.contenuPropose.prix }} TND</td>
+          </tr>
+        </table>
+      </div>
+      <p class="legende">Les cases en jaune sont les champs modifiés.</p>
+
+      @if (!refus) {
+        <div class="actions">
+          <button type="button" class="btn btn-primaire" (click)="accepter()">Valider la modification</button>
+          <button type="button" class="btn btn-danger" (click)="refus = true">Refuser</button>
+        </div>
+      } @else {
+        <textarea rows="4" [(ngModel)]="commentaire" placeholder="Motif du refus (obligatoire)"></textarea>
+        <div class="actions">
+          <button type="button" class="btn btn-danger" (click)="confirmerRefus()">Confirmer le refus</button>
+          <button type="button" class="btn" (click)="refus = false">Annuler</button>
+        </div>
+      }
+    </section>
+  }
+</main>

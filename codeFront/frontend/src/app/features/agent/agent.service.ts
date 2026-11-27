@@ -72,4 +72,18 @@ export class AgentService {
       commentaire,
     });
   }
+    listerModifications(): Observable<any[]> {
+    return this.api.get<any[]>(`${API}/modifications`);
+  }
+
+  detailModification(id: string): Observable<any> {
+    return this.api.get<any>(`${API}/modifications/${encodeURIComponent(id)}`);
+  }
+
+  traiterModification(id: string, decision: string, commentaire?: string): Observable<any> {
+    return this.api.patch<any>(`${API}/modifications/${encodeURIComponent(id)}/traiter`, {
+      decision,
+      commentaire,
+    });
+  }
 }
